@@ -1,0 +1,29 @@
+{
+  "kind": "file",
+  "claim": "simulation",
+  "note": "Labeled simulation — not clinical accuracy. Proxy channels, not GC-MS.",
+  "intensity": 0.82,
+  "baseline": 0.14,
+  "channels": {
+    "acetone": 0.88,
+    "isoprene": 0.81,
+    "ammonia": 0.22,
+    "benzene": 0.08,
+    "alkanes": 0.11,
+    "aldehydes": 0.09,
+    "hydrocarbons": 0.07,
+    "dimethyl_sulfide": 0.06,
+    "sulfur": 0.05,
+    "aliphatic_acids": 0.04,
+    "skatole": 0.03,
+    "ketones": 0.12,
+    "sebum_vocs": 0.04,
+    "lipid_oxidation": 0.05,
+    "ethanol_trace": 0.1,
+    "toluene": 0.04,
+    "ethane": 0.05,
+    "propanol": 0.08,
+    "butane": 0.04,
+    "methane_trace": 0.03
+  }
+}

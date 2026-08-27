@@ -1,0 +1,11 @@
+{
+  "place": true,
+  "sources": {
+    "corti": "https://github.com/EverettNC/CORTI.git",
+    "lucent": "https://github.com/EverettNC/LUCENT.git",
+    "opensmell": "https://github.com/EverettNC/OpenSmell.git",
+    "skin": "this body"
+  },
+  "stream": "fifth",
+  "ticks": []
+}

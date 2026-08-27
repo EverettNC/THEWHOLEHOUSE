@@ -1,0 +1,7 @@
+{
+  "kind": "sample",
+  "claim": "record",
+  "note": "Sample hallway air. Not the house. One reducing-gas intensity, not twenty species.",
+  "intensity": 0.18,
+  "baseline": 0.12
+}
