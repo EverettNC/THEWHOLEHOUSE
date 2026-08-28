@@ -65,10 +65,15 @@ export function HouseSign() {
           {hearing ? <Volume2 /> : <VolumeX />}
           {hearing ? "Playing with sound" : "You gotta see this"}
         </Button>
+        <Button asChild variant="outline">
+          <a href="/THE-WHOLE-HOUSE.mp4" download="THE-WHOLE-HOUSE.mp4">
+            Download the clip
+          </a>
+        </Button>
         <p className="max-w-prose font-mono text-[0.625rem] tracking-[0.16em] text-subtle uppercase">
           {blocked
             ? "This frame ate the sound. Tap again, or open the body in its own window."
-            : "Tap the wood. Sound rides the turn."}
+            : "Tap the wood for sound. Download puts the clip on your phone."}
         </p>
       </figcaption>
     </figure>
