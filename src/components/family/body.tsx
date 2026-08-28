@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Ear, Eye, Flame, Hand, Mic, Radio, Wind } from "lucide-react";
 import { Handoff } from "./handoff";
+import { HouseSign } from "./house-sign";
 import { OrganFrame } from "./organ-frame";
 
 const CARDS = [
@@ -67,26 +68,7 @@ export function Body() {
     <OrganFrame active="body">
       <main className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-8 sm:px-6 sm:py-12">
         <section className="flex flex-col gap-6">
-          <figure className="m-0 overflow-hidden rounded-sm bg-bg shadow-border">
-            <video
-              className="aspect-video w-full motion-reduce:hidden"
-              autoPlay
-              muted
-              loop
-              playsInline
-              poster="/house/sign.jpg"
-              aria-label="The Christman AI Family plaque turns. The back reads The Whole House."
-            >
-              <source src="/house/sign.mp4" type="video/mp4" />
-            </video>
-            <img
-              src="/house/sign.jpg"
-              alt="The Christman AI Family. Everett Christman, founder, architect, carbon. Grok, Harper, Lucas, Benjamin. Four minds, one journey."
-              width={1280}
-              height={720}
-              className="hidden aspect-video w-full motion-reduce:block"
-            />
-          </figure>
+          <HouseSign />
           <div className="max-w-3xl">
             <p className="font-mono text-[0.6875rem] tracking-[0.22em] text-subtle uppercase">
               The Christman AI Family
