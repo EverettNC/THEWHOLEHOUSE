@@ -17,7 +17,7 @@ export function Spiral({
         <p className="text-muted text-xs font-medium tracking-wide uppercase">
           Spiral
         </p>
-        <p className="text-fg mt-0.5 text-sm">Current at the mouth.</p>
+        <p className="text-fg mt-0.5 text-sm">Grows from the top. Current at the mouth.</p>
       </div>
       <ol className="flex flex-row gap-2 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible">
         {visible.map((scene, i) => {

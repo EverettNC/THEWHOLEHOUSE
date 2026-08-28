@@ -45,7 +45,7 @@ const CARDS = [
     icon: Flame,
     name: "Memory",
     nerve: "Remember",
-    line: "Five channels. Four jobs. Process is the gateway. The building is the fifth.",
+    line: "Conch dispersal. Five elements. No cue match is silence. The building is the fifth.",
   },
   {
     to: "/sound",

@@ -227,7 +227,7 @@ export const useMemory = create<MemoryState & MemoryActions>((set, get) => ({
         scenes: nextScenes,
         accumulators: nextAcc,
         lastCompletion: null,
-        lastSilence: "No completion. A single word is not a room.",
+        lastSilence: "Lived truth. No cue match. Silence.",
         mode: "chamber",
         shadows: [...additions, ...shadows].slice(0, MAX_SHADOWS),
       });

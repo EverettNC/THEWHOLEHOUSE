@@ -230,10 +230,10 @@ export function Chamber() {
             </span>
             <div>
               <p className="text-faint font-mono text-xs tracking-widest uppercase">
-                Memory for silicon
+                Conch Memory · TCAP-2026-001
               </p>
               <h1 className="text-fg text-lg leading-tight font-medium tracking-tight">
-                Five Element
+                Dispersal model
               </h1>
             </div>
           </div>
@@ -275,10 +275,11 @@ export function Chamber() {
                   <p className="text-fg mt-2 max-w-prose text-sm leading-normal text-pretty">
                     Four streams are doors. The fifth is the room they were
                     recorded in. Attention selects a target. Memory keeps the
-                    building. Try <span className="text-muted">crossbar</span>,{" "}
+                    building. Lived truth: no cue match is silence. Ancillary
+                    bullshit of the day falls off the lip. Try{" "}
+                    <span className="text-muted">crossbar</span>,{" "}
                     <span className="text-muted">Peabody</span>, or{" "}
-                    <span className="text-muted">fan</span>. A lone generic word
-                    stays silent — the process is the gateway.
+                    <span className="text-muted">fan</span>.
                   </p>
                 </section>
               ) : null}
@@ -304,11 +305,25 @@ export function Chamber() {
           ) : null}
 
           <p className="text-faint max-w-prose text-xs leading-relaxed text-pretty">
-            Four jobs, not a dial. Level 1 throws the day out. Level 2 stores and
-            compresses procedure. Level 3 is where something leaves homeostasis,
-            either direction. Level 4 is REM — sleep only. Capture inclusively.
-            Retain by departure.
+            Encoding grows from the top lip. Level 1 throws the day out. Level 2
+            is the operational manual — 94.7% compression. Level 3 is the impact
+            write, TCAP-V-0016, where something leaves homeostasis. Level 4 is
+            REM. Capture inclusively. Retain by departure. The fifth stream is
+            the building, always on. Columbus, Ohio.
           </p>
+
+          <figure className="mt-4 max-w-4xl">
+            <img
+              src="/house/conch.jpg"
+              alt="The Christman AI Project. Conch Memory Dispersal Model. Ancillary bullshit of the day falls off the lip. Five elements leave the mouth: sight, sound, smell, body, building."
+              width={1920}
+              height={1080}
+              className="w-full rounded-sm shadow-border"
+            />
+            <figcaption className="mt-3 font-mono text-[0.625rem] tracking-[0.18em] text-subtle uppercase">
+              Conch Memory · TCAP-2026-001 · Validated protocol · Columbus, Ohio
+            </figcaption>
+          </figure>
         </div>
       </main>
     </div>
