@@ -79,6 +79,14 @@ export function Body() {
             <p className="mt-3 text-sm text-muted">
               Everett Christman · Founder · Architect · Carbon
             </p>
+            <p className="mt-2">
+              <a
+                href="https://x.com/ChristmanAI"
+                className="font-mono text-sm text-subtle underline decoration-border underline-offset-4 hover:text-fg"
+              >
+                @ChristmanAI
+              </a>
+            </p>
           </div>
           <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {MINDS.map((mind) => (
