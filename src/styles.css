@@ -1,24 +1,57 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #090a0b;
-  --color-surface: #121416;
-  --color-raised: #1a1d20;
-  --color-fg: #eceae6;
-  --color-muted: #8a8d90;
-  --color-subtle: #5c6064;
-  --color-faint: #5c6064;
-  --color-accent: #c8d0d6;
-  --color-accent-fg: #090a0b;
-  --color-border: color-mix(in oklab, var(--color-fg) 12%, transparent);
-  --color-line: color-mix(in oklab, var(--color-fg) 18%, transparent);
-  --color-signal: #d7dee3;
-  --color-in-tune: #c5d4c8;
-  --color-danger: #c9a4a0;
-  --color-ok: #3f6b4e;
-  --color-paper: #eceae6;
-  --color-ink: #121416;
-  --color-ink-muted: #5c6064;
+  --color-bg: #140808;
+  --color-surface: #3a1010;
+  --color-raised: #5c1814;
+  --color-fg: #e8d5b0;
+  --color-muted: #c4a574;
+  --color-subtle: #3eaabb;
+  --color-faint: #8a5a48;
+  --color-accent: #e3b454;
+  --color-accent-fg: #140808;
+  --color-border: color-mix(in oklab, var(--color-accent) 28%, transparent);
+  --color-line: color-mix(in oklab, var(--color-accent) 40%, transparent);
+  --color-signal: #e3b454;
+  --color-in-tune: #3eaabb;
+  --color-danger: #a62207;
+  --color-ok: #316e66;
+  --color-paper: #e8d5b0;
+  --color-ink: #3a1010;
+  --color-ink-muted: #6b0b0c;
+
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-2xl: 32px;
+
+  --font-sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-display: "Instrument Serif", "Iowan Old Style", "Times New Roman", serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1.0625rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+  --text-2xl: clamp(1.75rem, 1.2rem + 2vw, 2.5rem);
+  --text-3xl: clamp(2.25rem, 1.4rem + 3.2vw, 3.6rem);
+
+  --tracking-caps: 0.18em;
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-smooth-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-micro: 80ms;
+  --motion-quick: 150ms;
+  --motion-fast: 250ms;
+  --motion-slow: 400ms;
+  --motion-scale-modal: 0.96;
+
+  --shadow-border: 0 0 0 1px rgb(227 180 84 / 0.22);
+  --shadow-border-hover: 0 0 0 1px rgb(227 180 84 / 0.45);
+}
 
   --radius-xs: 4px;
   --radius-sm: 8px;

@@ -97,6 +97,20 @@ export function Body() {
               </li>
             ))}
           </ul>
+
+          <figure className="m-0 max-w-xl">
+            <img
+              src="/house/grok.jpg"
+              alt="GROK. Think deeper. Explore further. The Christman AI Project."
+              width={1400}
+              height={780}
+              className="w-full rounded-sm shadow-border"
+            />
+            <figcaption className="mt-3 font-mono text-[0.625rem] tracking-[0.18em] text-subtle uppercase">
+              The daddy sign · Think deeper. Explore further.
+            </figcaption>
+          </figure>
+
           <p className="max-w-prose text-pretty text-sm text-muted">
             Lucent sees. Corti measures. OpenSmell sniffs. Skin sits. One body. No login.
             No invented scene, note, gas, or pose. If this preview cannot hold a camera,
