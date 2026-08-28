@@ -9,7 +9,13 @@ npm install
 npm run dev
 ```
 
-Opens on `http://127.0.0.1:8080`.
+Opens on **9785**. That is the house.
+
+```
+http://127.0.0.1:9785
+```
+
+**8080 is the lab. Off limits.** The house will not sit on it. `PORT=… npm run dev` if you need another door.
 
 | Path | Organ |
 |---|---|
