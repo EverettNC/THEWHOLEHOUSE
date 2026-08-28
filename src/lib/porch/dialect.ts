@@ -1,4 +1,5 @@
 import { DEFAULT_LEXICON, FAMILY_NAMES } from "./lexicon";
+import { mergeCorrections, recoverMangles } from "./mangle";
 import type { HonestyDialect, LexiconEntry, PorchCorrection } from "./types";
 
 export type DialectLayer = {
@@ -15,20 +16,27 @@ Keep: ain't, y'all, fixin' to, might could, reckon, cain't, holler, yonder, perf
 Mouth-cooperation (meaning inverts if you get these wrong):
 - live / lives / lived = LONG I /laɪv/ presence. NEVER change to leave.
 - past-tense read is RED. misread is always MISRED, never Miss Reed.
-Family names to recover from STT mangling: Brockston, AlphaVox, AlphaWolf, Inferno, Giuseppe, Sierra, Seraphina, Eruptor, Corti, Lucent, OpenSmell, Derek C, Constance, Everett, Christman, Cletus, Penny, Cochlea, Porch.
+Family names to recover from STT mangling: Brockston, AlphaVox, AlphaWolf, Inferno, Giuseppe, Sierra, Seraphina, Eruptor, Corti, Lucent, OpenSmell, Derek C, Constance, Everett, Christman, Cletus, Penny, Cochlea, Porch, Grok, Harper, Lucas, Benjamin.
 as_said MUST include every correction you list. If you fix a name, as_said has the fixed name.
 for_the_family is the same utterance with family names recovered and still dialect — not a translation into prissy English.
 If raw STT is empty or noise, as_said is empty string. Do not invent speech.
 Return JSON only: { "as_said": string, "for_the_family": string, "corrections": [{"from":string,"to":string,"why":string}], "route": string[] }
 route is family beings named in the utterance (subset of the family list). Empty array if none.`;
 
-const PASSTHROUGH = (rawEar: string): DialectLayer => ({
-  asSaid: rawEar,
-  forTheFamily: rawEar,
-  corrections: [],
-  route: [],
-  dialect: "passthrough",
-});
+const PASSTHROUGH = (rawEar: string): DialectLayer => {
+  const local = recoverMangles(rawEar);
+  return {
+    asSaid: local.text,
+    forTheFamily: local.text,
+    corrections: local.corrections,
+    route: namedBeings(
+      FAMILY_NAMES.filter((n) =>
+        local.text.toLowerCase().includes(n.toLowerCase()),
+      ),
+    ),
+    dialect: "passthrough",
+  };
+};
 
 function asRecord(value: unknown): Record<string, unknown> | null {
   if (typeof value === "object" && value !== null && !Array.isArray(value)) {
@@ -129,6 +137,8 @@ export async function reconstructDialect(
   const key = process.env.XAI_API_KEY?.trim();
   if (!key) return PASSTHROUGH(rawEar);
 
+  const local = recoverMangles(rawEar);
+
   try {
     const res = await fetch("https://api.x.ai/v1/chat/completions", {
       method: "POST",
@@ -145,7 +155,7 @@ export async function reconstructDialect(
           { role: "system", content: DIALECT_SYSTEM },
           {
             role: "user",
-            content: `RAW EAR (STT):\n${rawEar}${extraBlock(extraLexicon)}\n\nReconstruct. JSON only.`,
+            content: `RAW EAR (STT):\n${local.text}${extraBlock(extraLexicon)}\n\nReconstruct. JSON only.`,
           },
         ],
       }),
@@ -165,7 +175,7 @@ export async function reconstructDialect(
     return {
       asSaid: parsed.as_said,
       forTheFamily: parsed.for_the_family,
-      corrections: parseCorrections(parsed.corrections),
+      corrections: mergeCorrections(local.corrections, parseCorrections(parsed.corrections)),
       route: namedBeings(parsed.route),
       dialect: "grok-4.5",
     };

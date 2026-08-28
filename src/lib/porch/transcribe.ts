@@ -106,9 +106,7 @@ export const transcribe = createServerFn({ method: "POST" })
     const keyterms = buildKeyterms(extraLexicon);
 
     const form = new FormData();
-    form.append("model", "grok-stt");
     form.append("language", "en");
-    form.append("format", "true");
     form.append("filler_words", "true");
     for (const term of keyterms) {
       form.append("keyterm", term);
