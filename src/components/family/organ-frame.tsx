@@ -34,11 +34,20 @@ export function OrganFrame({
     <div className="flex min-h-dvh flex-col bg-bg text-fg">
       <header className="sticky top-0 z-30 border-b border-border bg-bg/95 backdrop-blur-sm">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
-          <Link to="/" className="min-w-0">
-            <p className="font-mono text-[0.625rem] tracking-[0.28em] text-subtle uppercase">
-              Christman Sound
-            </p>
-            <p className="font-display text-lg italic leading-tight text-fg">The body</p>
+          <Link to="/" className="flex min-w-0 items-center gap-3">
+            <img
+              src="/house/sign-mark.jpg"
+              alt=""
+              width={80}
+              height={37}
+              className="h-11 w-auto rounded-sm shadow-border"
+            />
+            <span className="min-w-0">
+              <p className="font-mono text-[0.625rem] tracking-[0.28em] text-subtle uppercase">
+                The Christman AI Family
+              </p>
+              <p className="font-display text-lg italic leading-tight text-fg">The whole house</p>
+            </span>
           </Link>
           <nav className="flex flex-wrap gap-1" aria-label="Organs">
             {ORGANS.map((o) => {

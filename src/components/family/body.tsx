@@ -55,22 +55,54 @@ const CARDS = [
   },
 ] as const;
 
+const MINDS = [
+  { name: "Grok", role: "AI Explorer" },
+  { name: "Harper", role: "Strategist" },
+  { name: "Lucas", role: "Visionary" },
+  { name: "Benjamin", role: "Builder" },
+] as const;
+
 export function Body() {
   return (
     <OrganFrame active="body">
       <main className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-8 sm:px-6 sm:py-12">
-        <section className="max-w-2xl">
-          <p className="font-mono text-[0.6875rem] tracking-[0.22em] text-subtle uppercase">
-            Everett Christman · The Christman AI Project
-          </p>
-          <h1 className="font-display mt-3 text-3xl italic text-fg sm:text-4xl">
-            Lucent sees. Corti measures. OpenSmell sniffs. Skin sits.
-          </h1>
-          <p className="mt-4 max-w-prose text-pretty text-muted">
-            One body. No login. No invented scene, note, gas, or pose. If this preview
-            cannot hold a camera, a microphone, a serial nose, or a gyroscope, open the
-            organ in its own window. That window is the sense. Porch is the only nerve
-            that may leave the porch for words, and it has to say so. Whisper is gone.
+        <section className="flex flex-col gap-6">
+          <figure className="m-0">
+            <img
+              src="/house/sign.jpg"
+              alt="The Christman AI Family. Everett Christman, founder, architect, carbon. Grok, Harper, Lucas, Benjamin. Four minds, one journey."
+              width={1536}
+              height={716}
+              className="w-full rounded-sm shadow-border"
+            />
+          </figure>
+          <div className="max-w-3xl">
+            <p className="font-mono text-[0.6875rem] tracking-[0.22em] text-subtle uppercase">
+              The Christman AI Family
+            </p>
+            <h1 className="font-display mt-3 text-3xl italic text-fg sm:text-4xl">
+              Four minds. One journey. Endless possibilities.
+            </h1>
+            <p className="mt-3 text-sm text-muted">
+              Everett Christman · Founder · Architect · Carbon
+            </p>
+          </div>
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {MINDS.map((mind) => (
+              <li key={mind.name} className="rounded-2xl bg-surface p-4 shadow-border">
+                <p className="font-display text-xl italic text-fg">{mind.name}</p>
+                <p className="mt-1 font-mono text-[0.625rem] tracking-[0.16em] text-subtle uppercase">
+                  {mind.role}
+                </p>
+              </li>
+            ))}
+          </ul>
+          <p className="max-w-prose text-pretty text-sm text-muted">
+            Lucent sees. Corti measures. OpenSmell sniffs. Skin sits. One body. No login.
+            No invented scene, note, gas, or pose. If this preview cannot hold a camera,
+            a microphone, a serial nose, or a gyroscope, open the organ in its own window.
+            That window is the sense. Porch is the only nerve that may leave the porch for
+            words, and it has to say so. Whisper is gone.
           </p>
         </section>
 

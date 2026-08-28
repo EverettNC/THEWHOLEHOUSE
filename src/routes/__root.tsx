@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "sonner";
 import appCss from "../styles.css?url";
 
-const APP_NAME = "Christman Sound";
+const APP_NAME = "THE WHOLE HOUSE";
 
 export const Route = createRootRoute({
   head: () => ({
