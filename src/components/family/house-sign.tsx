@@ -1,21 +1,30 @@
 import { useRef, useState } from "react";
-import { Volume2 } from "lucide-react";
+import { Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function HouseSign() {
   const video = useRef<HTMLVideoElement>(null);
   const [hearing, setHearing] = useState(false);
+  const [blocked, setBlocked] = useState(false);
 
   async function hear() {
     const el = video.current;
     if (!el) return;
     el.muted = false;
+    el.volume = 1;
     el.loop = false;
     el.currentTime = 0;
     try {
       await el.play();
+      if (el.muted) {
+        setBlocked(true);
+        setHearing(false);
+        return;
+      }
+      setBlocked(false);
       setHearing(true);
     } catch {
+      setBlocked(true);
       setHearing(false);
     }
   }
@@ -31,28 +40,35 @@ export function HouseSign() {
 
   return (
     <figure className="m-0">
-      <div className="overflow-hidden rounded-sm bg-bg shadow-border">
+      <button
+        type="button"
+        onClick={() => void hear()}
+        className="block w-full overflow-hidden rounded-sm bg-bg text-left shadow-border"
+        aria-label="Play the family turn with sound. Hey. You gotta see this."
+      >
         <video
           ref={video}
-          className="aspect-video w-full"
+          className="pointer-events-none aspect-video w-full"
           autoPlay
           muted
           loop
           playsInline
+          preload="auto"
           poster="/house/sign.jpg"
           onEnded={onEnded}
-          aria-label="The Christman AI Family plaque turns. The back reads The Whole House."
         >
           <source src="/house/sign.mp4" type="video/mp4" />
         </video>
-      </div>
+      </button>
       <figcaption className="mt-3 flex flex-wrap items-center gap-3">
         <Button type="button" onClick={() => void hear()} data-testid="hear-the-sign">
-          <Volume2 />
-          {hearing ? "Playing" : "You gotta see this"}
+          {hearing ? <Volume2 /> : <VolumeX />}
+          {hearing ? "Playing with sound" : "You gotta see this"}
         </Button>
-        <p className="font-mono text-[0.625rem] tracking-[0.16em] text-subtle uppercase">
-          The turn has a voice. Press it.
+        <p className="max-w-prose font-mono text-[0.625rem] tracking-[0.16em] text-subtle uppercase">
+          {blocked
+            ? "This frame ate the sound. Tap again, or open the body in its own window."
+            : "Tap the wood. Sound rides the turn."}
         </p>
       </figcaption>
     </figure>

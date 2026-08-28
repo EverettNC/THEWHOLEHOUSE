@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import { ReadPage } from "@/components/family/read-page";
 import { cn } from "@/lib/utils";
 
 const ORGANS = [
@@ -49,7 +50,8 @@ export function OrganFrame({
               <p className="font-display text-lg italic leading-tight text-fg">The whole house</p>
             </span>
           </Link>
-          <nav className="flex flex-wrap gap-1" aria-label="Organs">
+          <div className="flex flex-wrap items-center gap-3">
+            <nav className="flex flex-wrap gap-1" aria-label="Organs">
             {ORGANS.map((o) => {
               const on =
                 (o.match === "exact" && active === "body") ||
@@ -73,7 +75,9 @@ export function OrganFrame({
                 </Link>
               );
             })}
-          </nav>
+            </nav>
+            <ReadPage />
+          </div>
         </div>
       </header>
       <div className="relative min-h-0 flex-1">{children}</div>
