@@ -18,7 +18,7 @@ export const Route = createRootRoute({
         content:
           "Lucent sees. Corti measures. OpenSmell sniffs. Skin sits. Porch hears the words. Memory keeps the building.",
       },
-      { name: "theme-color", content: "#140808" },
+      { name: "theme-color", content: "#0c0d09" },
     ],
     links: [
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },

@@ -1,24 +1,24 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #140808;
-  --color-surface: #3a1010;
-  --color-raised: #5c1814;
-  --color-fg: #e8d5b0;
-  --color-muted: #c4a574;
-  --color-subtle: #3eaabb;
-  --color-faint: #8a5a48;
-  --color-accent: #e3b454;
-  --color-accent-fg: #140808;
-  --color-border: color-mix(in oklab, var(--color-accent) 28%, transparent);
-  --color-line: color-mix(in oklab, var(--color-accent) 40%, transparent);
-  --color-signal: #e3b454;
-  --color-in-tune: #3eaabb;
+  --color-bg: #0c0d09;
+  --color-surface: #12201e;
+  --color-raised: #1a2e2c;
+  --color-fg: #ddd3b3;
+  --color-muted: #8f9f8b;
+  --color-subtle: #8dceca;
+  --color-faint: #464531;
+  --color-accent: #b38e4a;
+  --color-accent-fg: #0c0d09;
+  --color-border: color-mix(in oklab, var(--color-accent) 32%, transparent);
+  --color-line: color-mix(in oklab, var(--color-subtle) 28%, transparent);
+  --color-signal: #8dceca;
+  --color-in-tune: #8dceca;
   --color-danger: #a62207;
   --color-ok: #316e66;
-  --color-paper: #e8d5b0;
-  --color-ink: #3a1010;
-  --color-ink-muted: #6b0b0c;
+  --color-paper: #d8edce;
+  --color-ink: #13110d;
+  --color-ink-muted: #464531;
 
   --radius-xs: 4px;
   --radius-sm: 8px;
@@ -49,8 +49,8 @@
   --motion-slow: 400ms;
   --motion-scale-modal: 0.96;
 
-  --shadow-border: 0 0 0 1px rgb(227 180 84 / 0.22);
-  --shadow-border-hover: 0 0 0 1px rgb(227 180 84 / 0.45);
+  --shadow-border: 0 0 0 1px rgb(179 142 74 / 0.28);
+  --shadow-border-hover: 0 0 0 1px rgb(141 206 202 / 0.45);
 }
 
   --radius-xs: 4px;
