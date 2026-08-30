@@ -80,9 +80,7 @@ function fail(error: string): TranscribeResult {
   return { ok: false, error };
 }
 
-export const transcribe = createServerFn({ method: "POST" })
-  .validator(transcribeInputSchema)
-  .handler(async ({ data }): Promise<TranscribeResult> => {
+export async function runPorchStt(data: TranscribeInput): Promise<TranscribeResult> {
     const key = process.env.XAI_API_KEY?.trim();
     if (!key) return fail("The word-ear is not available here.");
 
@@ -181,4 +179,8 @@ export const transcribe = createServerFn({ method: "POST" })
     };
 
     return { ok: true, take };
-  });
+}
+
+export const transcribe = createServerFn({ method: "POST" })
+  .validator(transcribeInputSchema)
+  .handler(async ({ data }): Promise<TranscribeResult> => runPorchStt(data));
