@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { ReadPage } from "@/components/family/read-page";
+import { startHouseListener } from "@/modules/memory/house";
+import { useMemory } from "@/modules/memory/store";
 import { cn } from "@/lib/utils";
 
 const ORGANS = [
@@ -11,7 +13,7 @@ const ORGANS = [
   { to: "/smell", label: "OpenSmell", match: "prefix" as const },
   { to: "/touch", label: "Skin", match: "prefix" as const },
   { to: "/remember", label: "Memory", match: "prefix" as const },
-  { to: "/sound", label: "Sound", match: "prefix" as const },
+  { to: "/sound", label: "Canal", match: "prefix" as const },
 ];
 
 export type OrganActive =
@@ -24,6 +26,27 @@ export type OrganActive =
   | "remember"
   | "sound";
 
+function HouseKeep() {
+  const hydrate = useMemory((s) => s.hydrate);
+  const tick = useMemory((s) => s.tick);
+  const hydrated = useMemory((s) => s.hydrated);
+
+  useEffect(() => {
+    hydrate();
+  }, [hydrate]);
+
+  useEffect(() => startHouseListener(), []);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    tick(Date.now());
+    const id = window.setInterval(() => tick(Date.now()), 1000);
+    return () => window.clearInterval(id);
+  }, [hydrated, tick]);
+
+  return null;
+}
+
 export function OrganFrame({
   children,
   active,
@@ -33,6 +56,7 @@ export function OrganFrame({
 }) {
   return (
     <div className="flex min-h-dvh flex-col bg-bg text-fg">
+      <HouseKeep />
       <header className="sticky top-0 z-30 border-b border-border bg-bg/95 backdrop-blur-sm">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
           <Link to="/" className="flex min-w-0 items-center gap-3">

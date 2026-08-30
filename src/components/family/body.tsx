@@ -17,7 +17,7 @@ const CARDS = [
     icon: Ear,
     name: "Corti",
     nerve: "Hearing",
-    line: "Organ of Corti. RMS, ZCR, YIN, LPC. Lock a pitch, or dash. Never 150 Hz.",
+    line: "The ear. Real sound. RMS, ZCR, YIN, LPC. Pitch if it locks, or dash. Never 150 Hz.",
   },
   {
     to: "/say",
@@ -31,14 +31,14 @@ const CARDS = [
     icon: Wind,
     name: "OpenSmell",
     nerve: "Smell",
-    line: "MQ-135 voltage. Proxy channels, not GC-MS. Not a diagnosis. Sample air is not the house.",
+    line: "Smell through OpenSmell. MQ-135 voltage. Proxy channels, not GC-MS. Not a diagnosis.",
   },
   {
     to: "/touch",
     icon: Hand,
     name: "Skin",
-    nerve: "Body",
-    line: "The machine under the skin. Fit, lean, sit. Contact and tilt, or dash.",
+    nerve: "Haptic",
+    line: "Haptic feedback. Pressure, lean, sit. The machine under the skin. Vibrate when it can.",
   },
   {
     to: "/remember",
@@ -50,9 +50,9 @@ const CARDS = [
   {
     to: "/sound",
     icon: Radio,
-    name: "Christman-Sound",
+    name: "Canal",
     nerve: "Ingest",
-    line: "Consumes Corti's card and tape. Kind stays on the ear. Measurements cross.",
+    line: "Christman-Sound. The canal. Consumes Corti's card and tape so you can hear it. Kind stays on the ear.",
   },
 ] as const;
 

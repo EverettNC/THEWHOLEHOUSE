@@ -1,7 +1,7 @@
 /**
- * Skin — the body nerve.
+ * Skin — the haptic nerve.
  *
- * Fit, lean, sit. Contact and tilt.
+ * Pressure, lean, sit. Contact and tilt. Vibrate when the machine can.
  * Do not invent a pose, a pulse, or a medical claim.
  * If this window has no gyroscope, say so. Press still works.
  */
@@ -48,7 +48,7 @@ export type SkinPacket = {
 };
 
 export const SKIN_HONESTY_RULE =
-  "Skin measures contact, lean, sit. No invented pose. No pulse. Pointer is the skin. Motion is the lean.";
+  "Skin is haptic. Contact, pressure, lean, sit. No invented pose. No pulse. Pointer is the skin. Motion is the lean. Vibrate when the machine can.";
 
 export const LEAN_DEG = 12;
 export const SIT_ACCEL = 0.15;

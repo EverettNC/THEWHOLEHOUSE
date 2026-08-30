@@ -25,6 +25,9 @@ export const FAMILY_NAMES = [
   "Penny",
   "Cochlea",
   "Porch",
+  "Canal",
+  "Opus",
+  "Claude",
 ] as const;
 
 /** Dialect that prissy STT "fixes." Keep it. */

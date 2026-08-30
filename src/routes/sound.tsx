@@ -3,5 +3,5 @@ import { SoundOrgan } from "@/components/family/sound-organ";
 
 export const Route = createFileRoute("/sound")({
   component: SoundOrgan,
-  head: () => ({ meta: [{ title: "Christman-Sound — ingest" }] }),
+  head: () => ({ meta: [{ title: "Canal — Christman-Sound" }] }),
 });

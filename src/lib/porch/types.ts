@@ -55,4 +55,4 @@ export type LexiconEntry = {
 };
 
 export const PORCH_HONESTY_RULE =
-  "Porch is the word-ear. It leaves the porch for xAI STT and grok-4.5. Corti does not transcribe. Dialect is kept. live is /laɪv/, not leave.";
+  "Porch is the word-ear. The tape leaves this house for xAI STT. The words go to grok-4.5. This house does not keep the recording. Dialect is kept. live is /laɪv/, not leave. Whisper is not in this body.";

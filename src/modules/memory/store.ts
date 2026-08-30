@@ -72,6 +72,7 @@ type MemoryActions = {
   setProcedure: (v: boolean) => void;
   setClaim: (c: Claim) => void;
   writeScene: () => void;
+  ingestPorch: (asSaid: string) => void;
   runNight: () => void;
   openScene: (id: string) => void;
   closeReturned: () => void;
@@ -364,6 +365,94 @@ export const useMemory = create<MemoryState & MemoryActions>((set, get) => ({
       draft: emptyChannels(),
       draftFacets: emptyFacets(),
       draftTitle: "",
+    });
+  },
+
+  ingestPorch: (asSaid) => {
+    const said = asSaid.trim();
+    if (!said) return;
+    const { scenes, now, openedAt, hydrated } = get();
+    if (!hydrated) get().hydrate();
+    const house = latestHouseTick();
+    const corti = house?.corti;
+    const lucent = house?.lucent;
+    const smell = house?.smell;
+    const skin = house?.skin;
+    const sound =
+      !corti?.listening
+        ? ""
+        : corti.rms <= 0.008
+          ? "Corti open. Quiet."
+          : corti.locked && corti.f0 != null
+            ? `Corti hearing. Energy ${corti.rms.toFixed(3)}. Pitch ${Math.round(corti.f0)} Hz.`
+            : `Corti hearing. Energy ${corti.rms.toFixed(3)}. Real sound.`;
+    const sight = lucent?.seeing
+      ? lucent.focused
+        ? "Light in. In focus."
+        : "Light in."
+      : "";
+    const smellDoor =
+      smell?.live && smell.intensity != null
+        ? `OpenSmell live. Intensity ${smell.intensity.toFixed(2)}.`
+        : "";
+    const bodyDoor = !skin?.live
+      ? ""
+      : `Haptic.${skin.pressure != null ? ` Pressure ${skin.pressure.toFixed(2)}.` : ""} ${
+          skin.posture === "lean"
+            ? "Lean."
+            : skin.posture === "sit"
+              ? "Sit."
+              : skin.contacting
+                ? "Contact."
+                : "Still."
+        }`;
+    const place = [
+      `The building, ${new Date(now || Date.now()).toUTCString()}.`,
+      house?.text ?? "The building continues.",
+    ].join(" ");
+    const title =
+      said.length > 48 ? `${said.slice(0, 45).trimEnd()}…` : said;
+    const t = now || Date.now();
+    const scene: Scene = {
+      id:
+        typeof crypto !== "undefined" && crypto.randomUUID
+          ? crypto.randomUUID()
+          : `porch-${t}`,
+      title,
+      writtenAt: t,
+      claim: "living",
+      job: "pending",
+      leftHomeostasis: true,
+      procedure: false,
+      channels: {
+        sight,
+        sound,
+        smell: smellDoor,
+        body: bodyDoor,
+        place,
+      },
+      facets: {
+        structural: "Heard on the porch. Landed in the building.",
+        stakes: "The family pulls from the rounded room.",
+        role: "Porch is the words. Corti is the sound.",
+        constraint: "Tape left for xAI STT. Words stayed. Sound is Corti.",
+        room: said,
+      },
+      indexSignature: [],
+      spiralDepth: 0,
+      shadowHits: 0,
+      reclaimed: false,
+      durationMs: openedAt ? Math.max(0, t - openedAt) : 0,
+      seeded: false,
+    };
+    scene.indexSignature = tokenize(
+      scene.title + " " + CHANNELS.map((c) => scene.channels[c]).join(" "),
+    );
+    const next = [scene, ...scenes].slice(0, MAX_SCENES);
+    persist(next);
+    set({
+      scenes: next,
+      now: t,
     });
   },
 

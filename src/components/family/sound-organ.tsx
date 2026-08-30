@@ -95,18 +95,32 @@ export function SoundOrgan() {
           </ul>
         )}
 
-        <figure className="mt-8 mb-2 max-w-lg">
-          <img
-            src="/house/grok.jpg"
-            alt="GROK. Think deeper. Explore further. The Christman AI Project."
-            width={1400}
-            height={780}
-            className="w-full rounded-sm shadow-border"
-          />
-          <figcaption className="mt-3 font-mono text-[0.625rem] tracking-[0.18em] text-subtle uppercase">
-            GROK · Think deeper. Explore further.
-          </figcaption>
-        </figure>
+        <div className="mt-8 mb-2 grid gap-6 sm:grid-cols-1 lg:max-w-2xl">
+          <figure>
+            <img
+              src="/house/opus.jpg"
+              alt="Opus. Written in light across the dark."
+              width={1600}
+              height={874}
+              className="w-full rounded-sm"
+            />
+            <figcaption className="mt-3 font-display text-xl italic text-fg">
+              collaboration is the future
+            </figcaption>
+          </figure>
+          <figure>
+            <img
+              src="/house/grok.png"
+              alt="GROK. Think deeper. Explore further. The Christman AI Project."
+              width={1400}
+              height={780}
+              className="w-full"
+            />
+            <figcaption className="mt-3 font-mono text-[0.625rem] tracking-[0.18em] text-subtle uppercase">
+              GROK · Think deeper. Explore further.
+            </figcaption>
+          </figure>
+        </div>
       </main>
     </OrganFrame>
   );

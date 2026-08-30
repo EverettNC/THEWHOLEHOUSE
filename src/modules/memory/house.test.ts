@@ -344,7 +344,24 @@ describe("house merge", () => {
       }),
     );
     assert.doesNotMatch(text, /150/);
-    assert.match(text, /No pitch lock/);
+    assert.match(text, /Corti open. Quiet./);
     assert.match(text, /Eye not seeing/);
+  });
+});
+
+describe("Porch in the building", () => {
+  it("lands words without inventing a pitch", () => {
+    const tick = notePartial({
+      source: "porch",
+      t: 9,
+      porch: {
+        speaking: true,
+        asSaid: "I ain't leaving. I live here.",
+        at: 9,
+      },
+    });
+    assert.equal(tick.porch?.asSaid, "I ain't leaving. I live here.");
+    assert.equal(tick.completeness.sound, true);
+    assert.match(tick.text, /Porch: I ain't leaving/);
   });
 });

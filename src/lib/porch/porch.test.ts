@@ -62,8 +62,9 @@ describe("keyterms", () => {
 });
 
 describe("honesty", () => {
-  it("names xAI STT and never whisper", () => {
+  it("names xAI STT, keeps the tape off this house, and never uses Whisper", () => {
     assert.match(PORCH_HONESTY_RULE, /xAI STT/);
-    assert.doesNotMatch(PORCH_HONESTY_RULE, /whisper/i);
+    assert.match(PORCH_HONESTY_RULE, /does not keep the recording/);
+    assert.match(PORCH_HONESTY_RULE, /Whisper is not in this body/);
   });
 });

@@ -4,6 +4,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { transcribe } from "@/lib/porch/transcribe";
 import { taughtLexicon, usePorch } from "@/lib/porch/store";
+import { HOUSE_CHANNEL, notePartial } from "@/modules/memory/house";
+import { useMemory } from "@/modules/memory/store";
 import { blobToBase64, cn } from "@/lib/utils";
 
 type Phase = "idle" | "recording" | "hearing" | "error";
@@ -167,6 +169,28 @@ export function ListenStage() {
         }
         addTake(result.take);
         setActive(result.take.id);
+        const said = result.take.asSaid.trim();
+        if (said) {
+          notePartial({
+            source: "porch",
+            t: Date.now(),
+            porch: { speaking: true, asSaid: said, at: result.take.at },
+          });
+          try {
+            if (typeof BroadcastChannel !== "undefined") {
+              const ch = new BroadcastChannel(HOUSE_CHANNEL);
+              ch.postMessage({
+                source: "porch",
+                t: Date.now(),
+                porch: { speaking: true, asSaid: said, at: result.take.at },
+              });
+              ch.close();
+            }
+          } catch {
+            /* house is optional */
+          }
+          useMemory.getState().ingestPorch(said);
+        }
         toast("Heard.");
         setPhase("idle");
       } catch (err) {

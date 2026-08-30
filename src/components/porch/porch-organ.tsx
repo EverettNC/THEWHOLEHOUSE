@@ -11,8 +11,10 @@ export function PorchOrgan() {
         </p>
         <h1 className="font-display mt-2 text-3xl italic text-fg">The word-ear</h1>
         <p className="mt-3 max-w-prose text-pretty text-sm text-muted">
-          Corti measures pitch. Porch hears words. Words leave the porch for xAI STT
-          and grok-4.5. Dialect is kept. live is presence, not leave.
+          Corti is the ear — real sound, so you can hear it. Porch is the words.
+          OpenSmell is the nose. Skin is haptic. This path is the house, for
+          everyone. The tape leaves for xAI STT. The words come home to Memory.
+          Dialect stays. live is presence, not leave. Whisper is not in this body.
         </p>
       </section>
 

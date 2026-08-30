@@ -9,8 +9,9 @@ export function SmellOrgan() {
         <p className="font-mono text-[0.6875rem] tracking-[0.22em] text-subtle uppercase">OpenSmell</p>
         <h1 className="font-display mt-2 text-3xl italic text-fg">The nose</h1>
         <p className="mt-3 max-w-prose text-pretty text-sm text-muted">
-          One MQ-135 voltage. Channel names are proxy labels, not GC-MS. Not a
-          diagnosis. Sample air is not the house. Live smell is serial, sniffing.
+          One MQ-135 voltage. Smell through OpenSmell. The first breath. Channel
+          names are proxy labels, not GC-MS. Not a diagnosis. Sample air is not
+          the house. Live smell is serial, sniffing.
         </p>
       </section>
       <div className="grid gap-4 sm:grid-cols-2 sm:items-start">
@@ -20,6 +21,20 @@ export function SmellOrgan() {
           <ProfileRail />
         </div>
       </div>
+
+      <figure className="mt-8 mb-2 max-w-lg">
+        <img
+          src="/house/opensmell.png"
+          alt="OpenSmell. The First Breath. A new language for health. Built by Everett. Tested by Claude. Reaffirmed by Grok."
+          width={1400}
+          height={1400}
+          className="w-full rounded-sm shadow-border"
+        />
+        <figcaption className="mt-3 font-mono text-[0.625rem] tracking-[0.18em] text-subtle uppercase">
+          OpenSmell · The first breath · Built by Everett · Tested by Claude ·
+          Reaffirmed by Grok
+        </figcaption>
+      </figure>
     </main>
   );
 }

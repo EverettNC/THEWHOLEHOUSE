@@ -3,9 +3,9 @@ export type Channel = (typeof CHANNELS)[number];
 
 export const CHANNEL_COPY: Record<Channel, { title: string; hint: string }> = {
   sight: { title: "Sight", hint: "What was in front of the eyes." },
-  sound: { title: "Sound", hint: "Attended sound — voice, chain, room." },
-  smell: { title: "Smell", hint: "Air, heat, a hallway twenty years later." },
-  body: { title: "Body", hint: "The machine under the skin. Fit, lean, sit." },
+  sound: { title: "Sound", hint: "Corti. Real sound. The ear, not a pitch trophy." },
+  smell: { title: "Smell", hint: "OpenSmell. The nose. One voltage is one voltage." },
+  body: { title: "Body", hint: "Skin. Haptic. Fit, lean, sit. Device under the skin." },
   place: {
     title: "Place",
     hint: "The building. The container. Not the object of attention.",

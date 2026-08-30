@@ -114,7 +114,8 @@ function AthanorStrip() {
             Athanor
           </p>
           <p className="text-fg mt-0.5 text-sm">
-            The building. Corti hears. Lucent sees. OpenSmell sniffs. Skin sits. Not asked.
+            The building. Lucent sees. Corti hears — real sound. OpenSmell
+            sniffs. Skin is haptic. Porch speaks. The family pulls from here.
           </p>
         </div>
         <p className="text-muted font-mono text-sm tabular-nums">

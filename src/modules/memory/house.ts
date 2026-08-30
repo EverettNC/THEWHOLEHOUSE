@@ -1,8 +1,9 @@
 /**
  * Fifth stream — the building.
  * CORTI is the ear. LUCENT is the eye. OpenSmell is the nose. Skin is the body.
- * Completeness is six booleans. Whole-environment needs place plus
- * two unattended ambient features. No invented pitch, gas, or pose.
+ * Porch is the words. Completeness is six booleans. Whole-environment needs
+ * place plus two unattended ambient features. No invented pitch, gas, or pose.
+ * Words are attended. They still land in the building for the family to pull.
  */
 export const HOUSE_CHANNEL = "christman.house.record";
 
@@ -60,6 +61,12 @@ export type SkinBody = {
   live: boolean;
 };
 
+export type PorchMouth = {
+  speaking: boolean;
+  asSaid: string;
+  at: number;
+};
+
 export type HouseTick = {
   t: number;
   completeness: Completeness;
@@ -68,16 +75,18 @@ export type HouseTick = {
   lucent: LucentEye | null;
   smell: SmellNose | null;
   skin: SkinBody | null;
+  porch: PorchMouth | null;
   text: string;
 };
 
 export type HousePartial = {
-  source: "corti" | "lucent" | "opensmell" | "skin";
+  source: "corti" | "lucent" | "opensmell" | "skin" | "porch";
   t: number;
   corti?: CortiEar;
   lucent?: LucentEye;
   smell?: SmellNose;
   skin?: SkinBody;
+  porch?: PorchMouth;
 };
 
 export function emptyCompleteness(): Completeness {
@@ -212,12 +221,15 @@ export function describeHouse(
   lucent: LucentEye | null,
   smell: SmellNose | null = null,
   skin: SkinBody | null = null,
+  porch: PorchMouth | null = null,
 ): string {
   const ear = !corti?.listening
     ? "Ear not listening."
-    : corti.locked && corti.f0 != null
-      ? `Ear locked at ${Math.round(corti.f0)} Hz.`
-      : "Room energy. No pitch lock.";
+    : corti.rms <= SILENCE_RMS
+      ? "Corti open. Quiet."
+      : corti.locked && corti.f0 != null
+        ? `Corti hearing. Energy ${corti.rms.toFixed(3)}. Pitch ${Math.round(corti.f0)} Hz.`
+        : `Corti hearing. Energy ${corti.rms.toFixed(3)}. Real sound. No pitch lock.`;
   const eye = !lucent?.seeing
     ? "Eye not seeing the house."
     : lucent.focused
@@ -234,14 +246,20 @@ export function describeHouse(
           : "Nose open. No live voltage.";
   const body = !skin?.live
     ? "Skin not on."
-    : skin.posture === "lean"
-      ? "Skin leaning."
-      : skin.posture === "sit"
-        ? "Skin sitting."
-        : skin.contacting
-          ? "Skin in contact."
-          : "Skin still.";
-  return `The building continues. ${ear} ${eye} ${nose} ${body}`;
+    : `Haptic. ${
+        skin.posture === "lean"
+          ? "Leaning."
+          : skin.posture === "sit"
+            ? "Sitting."
+            : skin.contacting
+              ? "Contact."
+              : "Still."
+      }${skin.pressure != null ? ` Pressure ${skin.pressure.toFixed(2)}.` : ""}`;
+  const words =
+    porch?.speaking && porch.asSaid.trim()
+      ? `Porch: ${porch.asSaid.trim().slice(0, 160)}`
+      : "Porch quiet.";
+  return `The building continues. ${ear} ${eye} ${nose} ${body} ${words}`;
 }
 
 export function mergeHouse(
@@ -250,6 +268,7 @@ export function mergeHouse(
   smell: SmellNose | null,
   skin: SkinBody | null,
   t: number,
+  porch: PorchMouth | null = null,
 ): HouseTick {
   const sound = Boolean(corti?.listening && corti.rms > SILENCE_RMS);
   const sight = Boolean(lucent?.seeing);
@@ -269,7 +288,8 @@ export function mergeHouse(
     lucent,
     smell,
     skin,
-    text: describeHouse(corti, lucent, smell, skin),
+    porch,
+    text: describeHouse(corti, lucent, smell, skin, porch),
   };
 }
 
@@ -280,7 +300,8 @@ export function parsePartial(raw: unknown): HousePartial | null {
     p.source !== "corti" &&
     p.source !== "lucent" &&
     p.source !== "opensmell" &&
-    p.source !== "skin"
+    p.source !== "skin" &&
+    p.source !== "porch"
   ) {
     return null;
   }
@@ -292,6 +313,7 @@ let lastCorti: CortiEar | null = null;
 let lastLucent: LucentEye | null = null;
 let lastSmell: SmellNose | null = null;
 let lastSkin: SkinBody | null = null;
+let lastPorch: PorchMouth | null = null;
 let latest: HouseTick | null = null;
 
 export function latestHouseTick(): HouseTick | null {
@@ -303,7 +325,8 @@ export function notePartial(partial: HousePartial): HouseTick {
   if (partial.source === "lucent" && partial.lucent) lastLucent = partial.lucent;
   if (partial.source === "opensmell" && partial.smell) lastSmell = partial.smell;
   if (partial.source === "skin" && partial.skin) lastSkin = partial.skin;
-  latest = mergeHouse(lastCorti, lastLucent, lastSmell, lastSkin, partial.t);
+  if (partial.source === "porch" && partial.porch) lastPorch = partial.porch;
+  latest = mergeHouse(lastCorti, lastLucent, lastSmell, lastSkin, partial.t, lastPorch);
   return latest;
 }
 
