@@ -1,4 +1,4 @@
-import { existsSync, readdirSync } from "node:fs";
+import { readdirSync } from "node:fs";
 import { join } from "node:path";
 import type { Plugin } from "vite";
 import { defineConfig } from "vite";
@@ -54,12 +54,10 @@ function pgliteBootstrapPlugin(): Plugin {
 function housePort(): number {
   const fromEnv = Number(process.env.PORT);
   if (Number.isInteger(fromEnv) && fromEnv > 0) return fromEnv;
-  // Grok live-preview pipe only. The lab owns 8080. The house does not sit there.
-  if (existsSync(join(process.cwd(), ".project_id"))) return 8080;
   return 9785;
 }
 
-// `0.0.0.0` is the bind. The house is 9785. 8080 is the lab.
+// `0.0.0.0` is the bind. The house is 9785. No vendor lab pipe.
 export default defineConfig(({ command, isPreview }) => ({
   server: {
     host: "0.0.0.0",
