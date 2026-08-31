@@ -17,6 +17,13 @@ const MANGLES: Array<{ re: RegExp; to: string; from: string; why: string }> = [
   { re: /\bmiss\s+reed\b/gi, to: "misread", from: "Miss Reed", why: "mouth-cooperation" },
   { re: /\bmiss\s+reid\b/gi, to: "misread", from: "Miss Reid", why: "mouth-cooperation" },
   { re: /\bleaved\b/gi, to: "lived", from: "leaved", why: "mouth-cooperation" },
+  // 2026-08-31. Everett said "haptic" five times describing Skin — his own
+  // organ, the word printed in AGENTS.project.md — and the ear returned
+  // "hectic" every time, then "heptic". Skin is the only organ whose name the
+  // ear cannot hold, so it is the only one he cannot dictate about.
+  { re: /\bhectic\s+feedback\b/gi, to: "haptic feedback", from: "hectic feedback", why: "mouth-cooperation" },
+  { re: /\bheptic\b/gi, to: "haptic", from: "heptic", why: "mouth-cooperation" },
+  { re: /\bhaptik\b/gi, to: "haptic", from: "haptik", why: "mouth-cooperation" },
 ];
 
 export function recoverMangles(text: string): {

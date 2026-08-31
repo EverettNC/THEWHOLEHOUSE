@@ -74,6 +74,11 @@ export const MOUTH_COOPERATION: LexiconEntry[] = [
     keep: "misread",
     note: "always MISRED /mɪsˈrɛd/. never Miss Reed.",
   },
+  {
+    said: "haptic",
+    keep: "haptic",
+    note: "HAP-tic /ˈhæptɪk/. flat a like cap. never hectic, never heptic. Skin's own word.",
+  },
 ];
 
 export const DEFAULT_LEXICON: LexiconEntry[] = [

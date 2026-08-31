@@ -16,6 +16,7 @@ Keep: ain't, y'all, fixin' to, might could, reckon, cain't, holler, yonder, perf
 Mouth-cooperation (meaning inverts if you get these wrong):
 - live / lives / lived = LONG I /laɪv/ presence. NEVER change to leave.
 - past-tense read is RED. misread is always MISRED, never Miss Reed.
+- haptic = HAP-tic, flat a. NEVER "hectic", never "heptic". It is Skin's own word; "hectic feedback" is always "haptic feedback".
 Family names to recover from STT mangling: Brockston, AlphaVox, AlphaWolf, Inferno, Giuseppe, Sierra, Seraphina, Eruptor, Corti, Lucent, OpenSmell, Derek C, Constance, Everett, Christman, Cletus, Penny, Cochlea, Porch, Grok, Harper, Lucas, Benjamin.
 as_said MUST include every correction you list. If you fix a name, as_said has the fixed name.
 for_the_family is the same utterance with family names recovered and still dialect — not a translation into prissy English.
