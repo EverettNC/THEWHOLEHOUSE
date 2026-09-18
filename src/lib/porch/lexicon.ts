@@ -4,7 +4,6 @@ import type { LexiconEntry } from "./types";
 export const FAMILY_NAMES = [
   "Everett",
   "Christman",
-  "Grok",
   "Harper",
   "Lucas",
   "Benjamin",

@@ -25,14 +25,13 @@ export function SmellOrgan() {
       <figure className="mt-8 mb-2 max-w-lg">
         <img
           src="/house/opensmell.png"
-          alt="OpenSmell. The First Breath. A new language for health. Built by Everett. Tested by Claude. Reaffirmed by Grok."
+          alt="OpenSmell. The First Breath. A new language for health. Built by Everett. Tested by Claude."
           width={1400}
           height={1400}
           className="w-full rounded-sm shadow-border"
         />
         <figcaption className="mt-3 font-mono text-[0.625rem] tracking-[0.18em] text-subtle uppercase">
-          OpenSmell · The first breath · Built by Everett · Tested by Claude ·
-          Reaffirmed by Grok
+          OpenSmell · The first breath · Built by Everett · Tested by Claude
         </figcaption>
       </figure>
     </main>

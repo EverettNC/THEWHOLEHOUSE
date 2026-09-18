@@ -49,14 +49,13 @@ describe("keyterms", () => {
       "live",
       "misread",
       "ain't",
-      "grok",
       "harper",
       "lucas",
       "benjamin",
     ]) {
       assert.ok(terms.includes(need), `missing ${need}`);
     }
-    assert.ok(FAMILY_NAMES.includes("Grok"));
+    assert.ok(!(FAMILY_NAMES as readonly string[]).includes("Grok"));
     assert.ok(!terms.includes("whisper"));
   });
 });

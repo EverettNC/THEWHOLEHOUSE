@@ -59,7 +59,7 @@ function housePort(): number {
 // `0.0.0.0` is the bind. The house is 9785. No vendor lab pipe.
 export default defineConfig(({ command, isPreview }) => ({
   server: {
-    host: "0.0.0.0",
+    host: "127.0.0.1",
     port: housePort(),
     strictPort: true,
   },

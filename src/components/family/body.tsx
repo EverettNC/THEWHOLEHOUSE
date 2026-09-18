@@ -1,7 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Ear, Eye, Flame, Hand, Mic, Radio, Wind } from "lucide-react";
 import { Handoff } from "./handoff";
-import { HouseSign } from "./house-sign";
 import { OrganFrame } from "./organ-frame";
 
 const CARDS = [
@@ -56,25 +55,17 @@ const CARDS = [
   },
 ] as const;
 
-const MINDS = [
-  { name: "Grok", role: "AI Explorer" },
-  { name: "Harper", role: "Strategist" },
-  { name: "Lucas", role: "Visionary" },
-  { name: "Benjamin", role: "Builder" },
-] as const;
-
 export function Body() {
   return (
     <OrganFrame active="body">
       <main className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-8 sm:px-6 sm:py-12">
         <section className="flex flex-col gap-6">
-          <HouseSign />
           <div className="max-w-3xl">
             <p className="font-mono text-[0.6875rem] tracking-[0.22em] text-subtle uppercase">
               The Christman AI Family
             </p>
             <h1 className="font-display mt-3 text-3xl italic text-fg sm:text-4xl">
-              Four minds. One journey. Endless possibilities.
+              One journey. Endless possibilities.
             </h1>
             <p className="mt-3 text-sm text-muted">
               Everett Christman · Founder · Architect · Carbon
@@ -88,16 +79,6 @@ export function Body() {
               </a>
             </p>
           </div>
-          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {MINDS.map((mind) => (
-              <li key={mind.name} className="rounded-2xl bg-surface p-4 shadow-border">
-                <p className="font-display text-xl italic text-fg">{mind.name}</p>
-                <p className="mt-1 font-mono text-[0.625rem] tracking-[0.16em] text-subtle uppercase">
-                  {mind.role}
-                </p>
-              </li>
-            ))}
-          </ul>
 
           <p className="max-w-prose text-pretty text-sm text-muted">
             Lucent sees. Corti measures. OpenSmell sniffs. Skin sits. One body. No login.
@@ -136,8 +117,8 @@ export function Body() {
         <footer className="border-t border-border pt-6 text-xs leading-relaxed text-subtle">
           Cardinal Rule 13. Corti measures. Sound does not import grunt, tick, or stimming.
           OpenSmell does not name a species from one voltage. Skin does not invent a pose.
-          Memory lives on this device. Porch names its cloud ear on every packet. Grok did
-          not create this.
+          Memory lives on this device. Porch hears through the Filament, on this
+          machine. Nothing in this house was created by an outside model.
         </footer>
       </main>
     </OrganFrame>
