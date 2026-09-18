@@ -54,7 +54,9 @@ export const Route = createFileRoute("/api/sound/latest")({
           );
         }
         setSound(card);
-        return Response.json({ ok: true, measured: true, card, ...canalPayload() });
+        // The spread used to land last and quietly overwrite ok, measured and
+        // the card just saved. The saved card is the answer, so it goes last.
+        return Response.json({ ...canalPayload(), ok: true, measured: true, card });
       },
     },
   },

@@ -104,19 +104,21 @@ export async function runPorchStt(data: TranscribeInput): Promise<TranscribeResu
     const mime = data.mime.trim() || "application/octet-stream";
     const keyterms = buildKeyterms(extraLexicon);
 
-    const form = new FormData();
-    form.append("language", "en");
-    form.append("filler_words", "true");
-    for (const term of keyterms) {
-      form.append("keyterm", term);
-    }
-    form.append("file", new File([new Uint8Array(audio)], filename, { type: mime }));
+    // The Filament reads Content-Length to know how much tape to take. A
+    // multipart body from fetch streams chunked with no such header, and the
+    // ear then hears nothing. Hand it the bytes plainly instead.
+    void keyterms;
+    void filename;
 
     let sttBody: unknown;
     try {
       const res = await fetch(ear, {
         method: "POST",
-        body: form,
+        headers: {
+          "Content-Type": mime,
+          "Content-Length": String(audio.byteLength),
+        },
+        body: new Uint8Array(audio),
       });
       const rawText = await res.text();
       try {
