@@ -73,7 +73,7 @@ function durationMsFrom(body: unknown): number {
 function earFor(source: TranscribeInput["source"]): HonestyEar {
   if (source === "sample") return "sample";
   if (source === "file") return "file";
-  return "xai-stt";
+  return "filament";
 }
 
 function fail(error: string): TranscribeResult {
@@ -81,8 +81,9 @@ function fail(error: string): TranscribeResult {
 }
 
 export async function runPorchStt(data: TranscribeInput): Promise<TranscribeResult> {
-    const key = process.env.XAI_API_KEY?.trim();
-    if (!key) return fail("The word-ear is not available here.");
+    // The tape does not leave this house. Porch hands it to the Filament, the
+    // local ear on 4850. No key, no outside call, nothing to disclose.
+    const ear = process.env.FILAMENT_EAR_URL?.trim() || "http://127.0.0.1:4850/stt";
 
     const extraLexicon: LexiconEntry[] = data.extraLexicon ?? [];
 
@@ -113,9 +114,8 @@ export async function runPorchStt(data: TranscribeInput): Promise<TranscribeResu
 
     let sttBody: unknown;
     try {
-      const res = await fetch("https://api.x.ai/v1/stt", {
+      const res = await fetch(ear, {
         method: "POST",
-        headers: { Authorization: `Bearer ${key}` },
         body: form,
       });
       const rawText = await res.text();
@@ -134,7 +134,7 @@ export async function runPorchStt(data: TranscribeInput): Promise<TranscribeResu
         );
       }
     } catch {
-      return fail("The word-ear could not be reached.");
+      return fail("The Filament could not be reached. Start it on 4850.");
     }
 
     const rawEar = pickTranscript(sttBody);

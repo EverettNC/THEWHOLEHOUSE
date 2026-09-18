@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { blobToBase64 } from "@/lib/utils";
+import { postLucentLive } from "@/lib/house/bridge-feed";
 
 export type LiveStatus = "idle" | "requesting" | "live" | "denied" | "missing";
 export type LiveKind = "camera" | "screen" | "file" | null;
@@ -669,4 +671,80 @@ export function liveSourceReady(snap: LiveSnap): HTMLImageElement | HTMLVideoEle
     return snap.video;
   }
   return null;
+}
+
+const HOUSE_EYE_MS = 500;
+let houseEyeTimer = 0;
+let houseEyeBusy = false;
+let houseEyeOn = false;
+
+function sourceSize(src: HTMLImageElement | HTMLVideoElement | HTMLCanvasElement) {
+  if (src instanceof HTMLVideoElement) return { w: src.videoWidth, h: src.videoHeight };
+  if (src instanceof HTMLImageElement) return { w: src.naturalWidth || src.width, h: src.naturalHeight || src.height };
+  return { w: src.width, h: src.height };
+}
+
+async function pushHouseEye() {
+  if (houseEyeBusy) return;
+  const snap = getLiveSnap();
+  const src = liveSourceReady(snap);
+  if (!src) return;
+  const { w, h } = sourceSize(src);
+  if (w < 2 || h < 2) return;
+  houseEyeBusy = true;
+  try {
+    const maxEdge = 640;
+    const scale = Math.min(1, maxEdge / Math.max(w, h));
+    const cw = Math.max(2, Math.round(w * scale));
+    const ch = Math.max(2, Math.round(h * scale));
+    const c = document.createElement("canvas");
+    c.width = cw;
+    c.height = ch;
+    const ctx = c.getContext("2d", { alpha: false });
+    if (!ctx) return;
+    ctx.drawImage(src, 0, 0, cw, ch);
+    const blob = await new Promise<Blob | null>((resolve) => c.toBlob(resolve, "image/jpeg", 0.55));
+    if (!blob) return;
+    const b64 = await blobToBase64(blob);
+    void postLucentLive({
+      seeing: true,
+      b64,
+      width: cw,
+      height: ch,
+      kind: snap.kind,
+    });
+  } finally {
+    houseEyeBusy = false;
+  }
+}
+
+function startHouseEye() {
+  if (houseEyeTimer) return;
+  houseEyeTimer = window.setInterval(() => {
+    void pushHouseEye();
+  }, HOUSE_EYE_MS);
+}
+
+function stopHouseEye() {
+  if (houseEyeTimer) {
+    window.clearInterval(houseEyeTimer);
+    houseEyeTimer = 0;
+  }
+  void postLucentLive({ seeing: false, b64: "", width: 0, height: 0, kind: null });
+}
+
+function syncHouseEye() {
+  const snap = getLiveSnap();
+  const live = snap.status === "live" && Boolean(liveSourceReady(snap) || snap.eyeOpen);
+  if (live && !houseEyeOn) {
+    houseEyeOn = true;
+    startHouseEye();
+  } else if (!live && houseEyeOn) {
+    houseEyeOn = false;
+    stopHouseEye();
+  }
+}
+
+if (typeof window !== "undefined") {
+  subscribeLive(syncHouseEye);
 }

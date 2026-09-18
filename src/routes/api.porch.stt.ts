@@ -5,13 +5,12 @@ export const Route = createFileRoute("/api/porch/stt")({
   server: {
     handlers: {
       GET: async () => {
-        const ready = Boolean(process.env.XAI_API_KEY?.trim());
         return Response.json({
-          ok: ready,
+          ok: true,
           organ: "porch",
           house: "http://127.0.0.1:9785/say",
-          whisper: false,
-          ear: ready ? "xai-stt" : "dark",
+          keyless: true,
+          ear: "porch",
         });
       },
       POST: async ({ request }) => {

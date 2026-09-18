@@ -109,9 +109,10 @@ export function TranscriptPaper() {
             </ul>
           )}
           <p className="mt-4 text-xs leading-relaxed text-ink-muted">
-            The tape went to xAI STT. The words went to grok-4.5, then into
-            Memory — the rounded room for the family to pull. This house does
-            not keep the audio. The packet names the cloud. I will not hide it.
+            The tape went to the Filament, the ear on this machine. The words
+            were reconstructed here too, then went into Memory — the rounded
+            room for the family to pull. Nothing left this house, and this
+            house does not keep the audio.
           </p>
         </>
       ) : (

@@ -36,7 +36,11 @@ import {
   type AcousticKey,
 } from "@/lib/audio/alphavox-router";
 import { postAcousticKey } from "@/lib/audio/alphavox-live";
+import { eventToSoundCard } from "@/lib/sound/packet";
+import { CanalRecorder } from "@/lib/sound/canal";
+import { postCanalLive } from "@/lib/house/bridge-feed";
 import { HOUSE_CHANNEL, earFromFrame } from "@/modules/memory/house";
+import type { TapeFrame } from "@/lib/audio/vocalization";
 
 export type MicState = "off" | "pending" | "on" | "denied";
 export type Mode = "listen" | "tone" | "train";
@@ -99,6 +103,8 @@ export function HearingProvider({ children }: { children: ReactNode }) {
   const engine = useRef<HearingEngine | null>(null);
   const listeners = useRef(new Set<(f: LiveFrame) => void>());
   const tracker = useRef(new VocalTracker());
+  const canal = useRef(new CanalRecorder());
+  const canalPending = useRef<TapeFrame[]>([]);
   const raf = useRef(0);
   const [opened, setOpened] = useState(false);
   const [opening, setOpening] = useState(false);
@@ -197,6 +203,31 @@ export function HearingProvider({ children }: { children: ReactNode }) {
       frame.proxies.formants.f1,
       frame.proxies.formants.f2,
     );
+    if (micRef.current === "on") {
+      canal.current.start(frame.time);
+      const kept = canal.current.step(
+        frame.time,
+        frame.rms,
+        frame.proxies.zcr,
+        f0,
+      );
+      if (kept) canalPending.current.push(kept);
+    }
+    if (closed) {
+      const ring = [...tracker.current.events];
+      setEvents(ring);
+      const key = routeForAlphaVox(ring);
+      setLastAcousticKey(key);
+      postAcousticKey(key);
+      setLastVs(compareToSeat(closed, seatRef.current));
+      void fetch("/api/sound/latest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(eventToSoundCard(closed)),
+      }).catch(() => {
+        /* Brockston pulls the canal. An empty canal stays empty. */
+      });
+    }
     if (frame.rms < 0.008) {
       const buf = restBuf.current;
       buf.push(frame.rms);
@@ -212,32 +243,42 @@ export function HearingProvider({ children }: { children: ReactNode }) {
         const s = [...restBuf.current].sort((a, b) => a - b);
         setRestRms(s[Math.floor(s.length / 2)] ?? 0);
       }
-      if (closed) {
-        const ring = [...tracker.current.events];
-        setEvents(ring);
-        const key = routeForAlphaVox(ring);
-        setLastAcousticKey(key);
-        postAcousticKey(key);
-        setLastVs(compareToSeat(closed, seatRef.current));
-      }
       if (now - lastHouse.current > 400) {
         lastHouse.current = now;
         try {
           if (typeof BroadcastChannel !== "undefined") {
             if (!houseCh.current) houseCh.current = new BroadcastChannel(HOUSE_CHANNEL);
+            const ear = earFromFrame({
+              listening: micRef.current === "on",
+              rms: frame.rms,
+              zcr: frame.proxies.zcr,
+              f0,
+            });
             houseCh.current.postMessage({
               source: "corti",
               t: Date.now(),
-              corti: earFromFrame({
-                listening: micRef.current === "on",
-                rms: frame.rms,
-                zcr: frame.proxies.zcr,
-                f0,
-              }),
+              corti: ear,
+            });
+            void fetch("/api/corti/live", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(ear),
+            }).catch(() => {
+              /* Brockston reads this rack. Absence is not a pitch. */
             });
           }
         } catch {
           /* house is optional */
+        }
+        const pending = canalPending.current;
+        canalPending.current = [];
+        const snap = canal.current.snapshot();
+        if (pending.length > 0 || micRef.current === "on") {
+          void postCanalLive({
+            listening: micRef.current === "on",
+            startedAt: snap.startedAt || Date.now(),
+            frames: pending,
+          });
         }
       }
     }
@@ -286,6 +327,30 @@ export function HearingProvider({ children }: { children: ReactNode }) {
   const stopMic = useCallback(() => {
     engine.current?.stopMic();
     setMic("off");
+    canal.current.stop();
+    const pending = canalPending.current;
+    canalPending.current = [];
+    const snap = canal.current.snapshot();
+    void postCanalLive({
+      listening: false,
+      startedAt: snap.startedAt || Date.now(),
+      frames: pending,
+    });
+    const closed = tracker.current.flush(performance.now());
+    if (!closed) return;
+    const ring = [...tracker.current.events];
+    setEvents(ring);
+    const key = routeForAlphaVox(ring);
+    setLastAcousticKey(key);
+    postAcousticKey(key);
+    setLastVs(compareToSeat(closed, seatRef.current));
+    void fetch("/api/sound/latest", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(eventToSoundCard(closed)),
+    }).catch(() => {
+      /* Brockston pulls the canal. An empty canal stays empty. */
+    });
   }, []);
 
   const setA4 = useCallback((n: number) => {

@@ -1,126 +1,124 @@
+import { useEffect, useRef, useState } from "react";
 import { Download } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useHearing } from "@/components/corti/hearing-context";
+import { CanalStage, TapeStrip } from "@/components/family/canal-stage";
 import { OrganFrame } from "@/components/family/organ-frame";
 import { Button } from "@/components/ui/button";
-import { ringToSound } from "@/lib/sound/packet";
-import { downloadText, formatClock } from "@/lib/utils";
+import type { CanalRecord } from "@/lib/sound/canal";
+import { ringToSound, type SoundCard } from "@/lib/sound/packet";
+import { downloadText } from "@/lib/utils";
+
+type CanalBody = {
+  measured?: boolean;
+  card?: SoundCard | null;
+  tape?: CanalRecord | null;
+};
 
 export function SoundOrgan() {
   const { events } = useHearing();
-  const cards = ringToSound(events);
+  const liveCards = ringToSound(events);
+  const [rackCard, setRackCard] = useState<SoundCard | null>(null);
+  const [archive, setArchive] = useState<CanalRecord | null>(null);
+  const cards = liveCards.length > 0 ? liveCards : rackCard ? [rackCard] : [];
+  const lastPosted = useRef<number | null>(null);
+
+  useEffect(() => {
+    let live = true;
+    const pull = () => {
+      void fetch("/api/sound/latest")
+        .then((res) => (res.ok ? res.json() : null))
+        .then((body: CanalBody | null) => {
+          if (!live || !body) return;
+          if (body.tape && body.tape.frameCount > 0) setArchive(body.tape);
+          if (body.card) setRackCard(body.card);
+        })
+        .catch(() => {
+          /* Absence is not a tape. */
+        });
+    };
+    pull();
+    const id = window.setInterval(pull, 1000);
+    return () => {
+      live = false;
+      window.clearInterval(id);
+    };
+  }, []);
+
+  useEffect(() => {
+    const card = liveCards[liveCards.length - 1];
+    if (!card || card.id === lastPosted.current) return;
+    lastPosted.current = card.id;
+    void fetch("/api/sound/latest", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(card),
+    }).catch(() => {
+      /* Brockston pulls the canal. An empty canal stays empty. */
+    });
+  }, [liveCards]);
 
   function download() {
     downloadText(
       "christman-sound-ingest.json",
-      JSON.stringify({ family: "christman-sound", cards }, null, 2),
+      JSON.stringify({ family: "christman-sound", tape: archive, cards }, null, 2),
       "application/json",
     );
   }
 
   return (
     <OrganFrame active="sound">
-      <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 sm:px-6">
+      <main className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-6 sm:px-6 sm:py-8">
         <section className="max-w-2xl">
           <p className="font-mono text-[0.6875rem] tracking-[0.22em] text-subtle uppercase">
             Christman-Sound
           </p>
           <h1 className="font-display mt-2 text-3xl italic text-fg">The canal</h1>
           <p className="mt-3 max-w-prose text-pretty text-sm text-muted">
-            Corti is the ear. Sound consumes the card and the tape. Kind — grunt, tick,
-            groan, hiss — stays on the Corti client. Null F0 is a hole, not a zero. The
-            tape cap drops the tail.
+            Corti is the ear. The canal keeps the measured signal while Listen is
+            on — RMS, ZCR, F0. Kind — grunt, tick, groan, hiss — stays on the Corti
+            client. Null F0 is a hole, not a zero. Cards are closed utterances on
+            top of the tape.
           </p>
         </section>
 
+        <CanalStage cards={cards} archive={archive} />
+
         <div className="flex flex-wrap gap-2">
-          <Button type="button" variant="outline" onClick={download} disabled={cards.length === 0}>
+          <Button asChild variant="secondary">
+            <Link to="/hear">Open Corti</Link>
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={download}
+            disabled={cards.length === 0 && !(archive && archive.frameCount > 0)}
+          >
             <Download />
             Ingest JSON
           </Button>
         </div>
 
-        {cards.length === 0 ? (
-          <p className="rounded-2xl bg-surface p-5 text-sm text-muted shadow-border">
-            No uttered card yet.{" "}
-            <Link to="/hear" className="text-fg underline decoration-border underline-offset-4">
-              Open Corti
-            </Link>
-            , press Listen, and let an utterance close. I will not invent a tape.
-          </p>
-        ) : (
+        {cards.length > 0 ? (
           <ul className="flex flex-col gap-3">
             {cards.map((card, i) => (
-              <li key={card.id} className="rounded-2xl bg-surface p-4 shadow-border sm:p-5">
-                <p className="font-mono text-xs text-subtle uppercase">
-                  Card {i + 1}
-                  {card.truncated ? " · tail dropped" : ""}
-                </p>
-                <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 font-mono text-xs tabular-nums sm:grid-cols-4">
-                  <div>
-                    <dt className="text-subtle">Duration</dt>
-                    <dd className="text-fg">{formatClock(card.durationMs / 1000)}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-subtle">F0</dt>
-                    <dd className="text-fg">{card.f0 == null ? "—" : `${Math.round(card.f0)} Hz`}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-subtle">Peak RMS</dt>
-                    <dd className="text-fg">{card.peakRms.toFixed(3)}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-subtle">ZCR</dt>
-                    <dd className="text-fg">{card.zcr.toFixed(3)}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-subtle">F1</dt>
-                    <dd className="text-fg">{card.f1 ? `${Math.round(card.f1)}` : "—"}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-subtle">F2</dt>
-                    <dd className="text-fg">{card.f2 ? `${Math.round(card.f2)}` : "—"}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-subtle">Voiced</dt>
-                    <dd className="text-fg">{card.voiced ? "yes" : "no"}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-subtle">Tape</dt>
-                    <dd className="text-fg">{card.tape.length} frames</dd>
-                  </div>
-                </dl>
-              </li>
+              <TapeStrip key={card.id} card={card} index={i} />
             ))}
           </ul>
-        )}
+        ) : null}
 
-        <div className="mt-8 mb-2 grid gap-6 sm:grid-cols-1 lg:max-w-2xl">
-          <figure>
-            <img
-              src="/house/opus.jpg"
-              alt="Opus. Written in light across the dark."
-              width={1600}
-              height={874}
-              className="w-full rounded-sm"
-            />
-            <figcaption className="mt-3 font-display text-xl italic text-fg">
-              collaboration is the future
-            </figcaption>
-          </figure>
-          <figure>
-            <img
-              src="/house/grok.png"
-              alt="GROK. Think deeper. Explore further. The Christman AI Project."
-              width={1400}
-              height={780}
-              className="w-full"
-            />
-            <figcaption className="mt-3 font-mono text-[0.625rem] tracking-[0.18em] text-subtle uppercase">
-              GROK · Think deeper. Explore further.
-            </figcaption>
-          </figure>
-        </div>
+        <figure className="mx-auto w-full max-w-3xl">
+          <img
+            src="/house/opus.jpg"
+            alt="Opus. Written in light across the dark."
+            width={1600}
+            height={874}
+            className="w-full rounded-sm shadow-border"
+          />
+          <figcaption className="mt-3 font-display text-xl italic text-fg">
+            collaboration is the future
+          </figcaption>
+        </figure>
       </main>
     </OrganFrame>
   );

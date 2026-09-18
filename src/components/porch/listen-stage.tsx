@@ -6,6 +6,7 @@ import { transcribe } from "@/lib/porch/transcribe";
 import { taughtLexicon, usePorch } from "@/lib/porch/store";
 import { HOUSE_CHANNEL, notePartial } from "@/modules/memory/house";
 import { useMemory } from "@/modules/memory/store";
+import { postPorchLive } from "@/lib/house/bridge-feed";
 import { blobToBase64, cn } from "@/lib/utils";
 
 type Phase = "idle" | "recording" | "hearing" | "error";
@@ -149,6 +150,7 @@ export function ListenStage() {
       if (blob.size < 32) {
         setPhase("error");
         setError("Nothing on the tape. Hold a little longer.");
+        void postPorchLive({ listening: false });
         return;
       }
       try {
@@ -165,10 +167,12 @@ export function ListenStage() {
         if (!result.ok) {
           setPhase("error");
           setError(result.error);
+          void postPorchLive({ listening: false });
           return;
         }
         addTake(result.take);
         setActive(result.take.id);
+        void postPorchLive({ listening: false, take: result.take });
         const said = result.take.asSaid.trim();
         if (said) {
           notePartial({
@@ -194,6 +198,7 @@ export function ListenStage() {
         toast("Heard.");
         setPhase("idle");
       } catch (err) {
+        void postPorchLive({ listening: false });
         setPhase("error");
         setError(err instanceof Error ? err.message : "The ear did not answer.");
       }
@@ -204,6 +209,7 @@ export function ListenStage() {
   const stopRecording = useCallback(() => {
     const rec = recRef.current;
     if (rec && rec.state !== "inactive") rec.stop();
+    else void postPorchLive({ listening: false });
   }, []);
 
   const startRecording = useCallback(async () => {
@@ -257,6 +263,7 @@ export function ListenStage() {
       };
       rec.start(100);
       setPhase("recording");
+      void postPorchLive({ listening: true });
     } catch {
       stopGraph();
       setPhase("error");

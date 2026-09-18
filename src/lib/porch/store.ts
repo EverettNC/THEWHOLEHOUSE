@@ -59,11 +59,11 @@ function isPorchCorrection(value: unknown): value is PorchCorrection {
 }
 
 function isHonestyEar(value: unknown): value is HonestyEar {
-  return value === "xai-stt" || value === "sample" || value === "file";
+  return value === "filament" || value === "sample" || value === "file";
 }
 
 function isHonestyDialect(value: unknown): value is HonestyDialect {
-  return value === "grok-4.5" || value === "passthrough";
+  return value === "filament" || value === "passthrough";
 }
 
 function isPorchTake(value: unknown): value is PorchTake {

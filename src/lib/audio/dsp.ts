@@ -81,50 +81,131 @@ export function christmanLpc(audio: ArrayLike<number>, order: number): Float32Ar
 export type Formants = { f1: number; f2: number; f3: number };
 
 /**
- * Formant peaks from |1 / A(ω)|. Same job as extract_frequency_signature
- * in voice_capture_client.py, but from LPC instead of raw FFT band-max.
- * Returns 0 for a slot that has no peak (never invents 150 Hz).
+ * Roots of the LPC polynomial, as {hz, bandwidthHz}, ascending by hz.
+ *
+ * christmanLpc returns Levinson-Durbin coefficients in the convention
+ *   A(z) = 1 - SUM a_k z^-k
+ * so the polynomial whose roots are the vocal-tract poles is, in descending
+ * powers of z:  [1, -a1, -a2, ... -ap].
+ *
+ * Solved by Durand-Kerner. Each conjugate pair is one resonance:
+ *   hz = angle(z) * sr / 2pi        bandwidth = -(sr/pi) * ln|z|
+ *
+ * Continuous frequencies — no FFT bin to snap to. A pole is a pole.
+ */
+export function lpcRoots(
+  coeffs: Float32Array,
+  sampleRate: number,
+): { hz: number; bandwidthHz: number }[] {
+  const p = coeffs.length - 1;
+  if (p < 2) return [];
+
+  // Descending-power coefficients of z^p - a1 z^(p-1) - ... - ap.
+  const c: number[] = [1];
+  for (let k = 1; k <= p; k++) c.push(-(coeffs[k] ?? 0));
+  // Strip leading zeros beyond the first (degree drop) and trailing zeros
+  // (roots at the origin carry no resonance).
+  let deg = p;
+  while (deg > 0 && Math.abs(c[deg] ?? 0) < 1e-12) deg--;
+  if (deg < 2) return [];
+
+  // Durand-Kerner from the standard 0.4+0.9i spiral.
+  const re = new Float64Array(deg);
+  const im = new Float64Array(deg);
+  for (let i = 0; i < deg; i++) {
+    const r = Math.pow(0.4 * 0.4 + 0.9 * 0.9, (i + 1) / 2);
+    const th = (i + 1) * Math.atan2(0.9, 0.4);
+    re[i] = r * Math.cos(th);
+    im[i] = r * Math.sin(th);
+  }
+
+  const evalPoly = (x: number, y: number): [number, number] => {
+    let ar = 0;
+    let ai = 0;
+    for (let k = 0; k <= deg; k++) {
+      const nr = ar * x - ai * y + (c[k] ?? 0);
+      ai = ar * y + ai * x;
+      ar = nr;
+    }
+    return [ar, ai];
+  };
+
+  for (let iter = 0; iter < 200; iter++) {
+    let moved = 0;
+    for (let i = 0; i < deg; i++) {
+      const xi = re[i] ?? 0;
+      const yi = im[i] ?? 0;
+      let [nr, ni] = evalPoly(xi, yi);
+      let dr = 1;
+      let di = 0;
+      for (let j = 0; j < deg; j++) {
+        if (j === i) continue;
+        const ux = xi - (re[j] ?? 0);
+        const uy = yi - (im[j] ?? 0);
+        const t = dr * ux - di * uy;
+        di = dr * uy + di * ux;
+        dr = t;
+      }
+      const den = dr * dr + di * di;
+      if (den < 1e-30) continue;
+      const qr = (nr * dr + ni * di) / den;
+      const qi = (ni * dr - nr * di) / den;
+      re[i] = xi - qr;
+      im[i] = yi - qi;
+      moved = Math.max(moved, Math.abs(qr) + Math.abs(qi));
+    }
+    if (moved < 1e-12) break;
+  }
+
+  const out: { hz: number; bandwidthHz: number }[] = [];
+  for (let i = 0; i < deg; i++) {
+    const x = re[i] ?? 0;
+    const y = im[i] ?? 0;
+    if (y <= 0) continue; // one of each conjugate pair
+    const mag = Math.hypot(x, y);
+    if (!(mag > 0) || mag >= 1) continue; // unstable / on the circle
+    const hz = (Math.atan2(y, x) * sampleRate) / (2 * Math.PI);
+    const bandwidthHz = (-(sampleRate / Math.PI) * Math.log(mag));
+    if (!Number.isFinite(hz) || !Number.isFinite(bandwidthHz)) continue;
+    out.push({ hz, bandwidthHz });
+  }
+  out.sort((a, b) => a.hz - b.hz);
+  return out;
+}
+
+/** A resonance wider than this is not a formant — it is spectral tilt or noise. */
+const MAX_FORMANT_BW_HZ = 500;
+
+/**
+ * Formants from the poles of A(z).
+ *
+ * Was: peaks of |1/A(w)| sampled on a 512-point grid, with A evaluated as
+ * 1 + SUM a_k — the wrong sign for Levinson's output. That spectrum has no
+ * local maxima at all, so every slot returned 0 on real vowels, while noise
+ * ripple occasionally cleared the absolute 0.4 cut and produced a number in
+ * the f2 slot that was never a formant. Proven 2026-09-01 against synthesised
+ * vowels with known F1/F2 and against pure noise.
+ *
+ * Now: solve for the poles directly. Continuous Hz, and a bandwidth per pole
+ * so a wide root can be rejected instead of reported.
+ *
+ * Contract unchanged: returns 0 for a slot that has no pole (never invents
+ * 150 Hz). `nfft` is retained for call-site compatibility and is unused —
+ * root-finding has no grid.
  */
 export function lpcFormants(
   coeffs: Float32Array,
   sampleRate: number,
-  nfft = 512,
+  _nfft = 512,
 ): Formants {
-  const half = nfft / 2;
-  const mag = new Float32Array(half);
-  for (let bin = 1; bin < half; bin++) {
-    const w = (Math.PI * bin) / half;
-    let re = 0;
-    let im = 0;
-    for (let i = 0; i < coeffs.length; i++) {
-      const c = coeffs[i] ?? 0;
-      re += c * Math.cos(w * i);
-      im -= c * Math.sin(w * i);
-    }
-    const den = re * re + im * im;
-    mag[bin] = den > 1e-12 ? 1 / Math.sqrt(den) : 0;
-  }
+  const poles = lpcRoots(coeffs, sampleRate).filter(
+    (r) => r.bandwidthHz > 0 && r.bandwidthHz <= MAX_FORMANT_BW_HZ && r.hz >= 180 && r.hz <= 4200,
+  );
 
-  const hzPer = sampleRate / nfft;
-  const peaks: { hz: number; mag: number }[] = [];
-  for (let bin = 2; bin < half - 1; bin++) {
-    const v = mag[bin] ?? 0;
-    if (v > (mag[bin - 1] ?? 0) && v >= (mag[bin + 1] ?? 0) && v > 0.4) {
-      const hz = bin * hzPer;
-      if (hz >= 180 && hz <= 4200) peaks.push({ hz, mag: v });
-    }
-  }
-
+  /** Lowest surviving pole in the band — formants are assigned in order. */
   const pick = (lo: number, hi: number) => {
-    let best = 0;
-    let bestMag = 0;
-    for (const p of peaks) {
-      if (p.hz >= lo && p.hz <= hi && p.mag > bestMag) {
-        bestMag = p.mag;
-        best = p.hz;
-      }
-    }
-    return best;
+    for (const r of poles) if (r.hz >= lo && r.hz <= hi) return r.hz;
+    return 0;
   };
 
   const f1 = pick(200, 1200);

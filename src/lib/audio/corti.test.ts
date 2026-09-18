@@ -10,6 +10,7 @@ import {
   christmanRms,
   christmanZcr,
   lpcFormants,
+  lpcRoots,
   smoothnessProxy,
   vadFromDsp,
   voiceQuality,
@@ -94,6 +95,113 @@ describe("christman_lpc", () => {
   it("silence returns a[0]=1", () => {
     const a = christmanLpc(silence(2048), 12);
     assert.equal(a[0], 1);
+  });
+});
+
+/**
+ * Known-truth formant tests. The old assertions ("f1 is 0 or >= 180") passed
+ * while lpcFormants returned 0 for every vowel ever spoken, because the LPC
+ * polynomial was evaluated with the wrong sign and its spectrum had no peaks
+ * at all. A test that a broken measurement passes is not a test. These
+ * synthesise a vowel with KNOWN F1/F2 and require them back.
+ */
+function resonator(x: Float32Array, fc: number, bw: number, sr: number): Float32Array {
+  const r = Math.exp((-Math.PI * bw) / sr);
+  const a1 = 2 * r * Math.cos((2 * Math.PI * fc) / sr);
+  const a2 = -(r * r);
+  const y = new Float32Array(x.length);
+  for (let i = 0; i < x.length; i++) {
+    y[i] = (x[i] ?? 0) + a1 * (i >= 1 ? (y[i - 1] ?? 0) : 0) + a2 * (i >= 2 ? (y[i - 2] ?? 0) : 0);
+  }
+  return y;
+}
+
+/** Impulse train at f0 through three resonators — a source-filter vowel. */
+function synthVowel(
+  f0: number, F1: number, F2: number, F3: number,
+  amp: number, sr: number, n: number,
+): Float32Array {
+  const src = new Float32Array(n);
+  const period = Math.round(sr / f0);
+  for (let i = 0; i < n; i += period) src[i] = 1;
+  const y = resonator(resonator(resonator(src, F1, 90, sr), F2, 120, sr), F3, 160, sr);
+  let peak = 0;
+  for (const v of y) peak = Math.max(peak, Math.abs(v));
+  const g = peak > 0 ? amp / peak : 0;
+  const out = new Float32Array(n);
+  for (let i = 0; i < n; i++) out[i] = (y[i] ?? 0) * g;
+  return out;
+}
+
+const VOWELS: [string, number, number, number][] = [
+  ["/a/", 730, 1090, 2440],
+  ["/i/", 270, 2290, 3010],
+  ["/u/", 300, 870, 2240],
+  ["/e/", 530, 1840, 2480],
+  ["/o/", 570, 840, 2410],
+];
+
+const SR_48 = 48000;
+const ORDER_48 = Math.round(SR_48 / 1000) + 2;
+const TOL_HZ = 60;
+
+describe("lpcFormants — known truth", () => {
+  for (const [name, F1, F2, F3] of VOWELS) {
+    it(`recovers F1 and F2 of ${name} within ${TOL_HZ} Hz`, () => {
+      const x = synthVowel(145, F1, F2, F3, 0.4, SR_48, 2048);
+      const f = lpcFormants(christmanLpc(x, ORDER_48), SR_48);
+      assert.ok(f.f1 > 0, `${name}: F1 not found (got 0)`);
+      assert.ok(f.f2 > 0, `${name}: F2 not found (got 0)`);
+      assert.ok(
+        Math.abs(f.f1 - F1) <= TOL_HZ,
+        `${name}: F1 ${f.f1.toFixed(0)} vs true ${F1}`,
+      );
+      assert.ok(
+        Math.abs(f.f2 - F2) <= TOL_HZ,
+        `${name}: F2 ${f.f2.toFixed(0)} vs true ${F2}`,
+      );
+    });
+  }
+
+  it("does not invent formants out of pure noise", () => {
+    let phantom = 0;
+    for (let t = 0; t < 25; t++) {
+      const noise = new Float32Array(2048);
+      for (let i = 0; i < noise.length; i++) noise[i] = Math.random() * 2 - 1;
+      const f = lpcFormants(christmanLpc(noise, ORDER_48), SR_48);
+      if (f.f1 > 0 || f.f2 > 0) phantom++;
+    }
+    assert.ok(phantom <= 2, `${phantom} of 25 noise frames produced a formant`);
+  });
+
+  it("is amplitude independent — gain must not change the answer", () => {
+    const loud = synthVowel(145, 530, 1840, 2480, 1.0, SR_48, 2048);
+    const quiet = synthVowel(145, 530, 1840, 2480, 0.003, SR_48, 2048);
+    const a = lpcFormants(christmanLpc(loud, ORDER_48), SR_48);
+    const b = lpcFormants(christmanLpc(quiet, ORDER_48), SR_48);
+    assert.ok(a.f1 > 0 && b.f1 > 0, "formants lost at low gain");
+    assert.ok(Math.abs(a.f1 - b.f1) < 1, `F1 moved with gain: ${a.f1} vs ${b.f1}`);
+    assert.ok(Math.abs(a.f2 - b.f2) < 1, `F2 moved with gain: ${a.f2} vs ${b.f2}`);
+  });
+
+  it("returns continuous Hz, not FFT bins", () => {
+    const x = synthVowel(145, 530, 1840, 2480, 0.4, SR_48, 2048);
+    const f = lpcFormants(christmanLpc(x, ORDER_48), SR_48);
+    const bin = SR_48 / 512;
+    const snapped = (v: number) => Math.abs(v / bin - Math.round(v / bin)) < 1e-6;
+    assert.ok(!snapped(f.f1) || !snapped(f.f2), "values still land exactly on 512-pt FFT bins");
+  });
+
+  it("rejects poles too wide to be formants", () => {
+    const x = synthVowel(145, 530, 1840, 2480, 0.4, SR_48, 2048);
+    const poles = lpcRoots(christmanLpc(x, ORDER_48), SR_48);
+    assert.ok(poles.length > 0, "no poles found at all");
+    const kept = poles.filter((r) => r.bandwidthHz <= 500 && r.hz >= 180 && r.hz <= 4200);
+    assert.ok(kept.length >= 2, "the formant poles were filtered away");
+    assert.ok(
+      poles.some((r) => r.bandwidthHz > 500),
+      "expected some wide poles to exist so the gate is doing work",
+    );
   });
 });
 
@@ -273,6 +381,43 @@ describe("vocalization tracker", () => {
     assert.ok(ev);
     assert.equal(ev.kind, "hiss");
     assert.equal(ev.voiced, false);
+  });
+
+  it("steady room energy that never dips still closes — the canal hang", () => {
+    const t = new VocalTracker();
+    let ev = null as ReturnType<VocalTracker["step"]>;
+    for (let i = 0; i < 420; i++) {
+      ev = t.step(i * 16, 0.032, 0.05, null, 0, 0) ?? ev;
+      if (ev) break;
+    }
+    assert.ok(ev, "an utterance that never goes quiet must still close");
+    assert.ok(ev.durationMs >= 4000, `durationMs=${ev.durationMs}`);
+    assert.ok(ev.tape.length >= 2);
+    assert.equal(t.open, false);
+  });
+
+  it("hang-close on room energy raises the floor — same RMS does not reopen", () => {
+    const t = new VocalTracker();
+    let ev = null as ReturnType<VocalTracker["step"]>;
+    for (let i = 0; i < 420; i++) {
+      ev = t.step(i * 16, 0.032, 0.05, null, 0, 0) ?? ev;
+      if (ev) break;
+    }
+    assert.ok(ev);
+    const after = t.step(ev.startedAt + ev.durationMs + 16, 0.032, 0.05, null, 0, 0);
+    assert.equal(after, null);
+    assert.equal(t.open, false);
+  });
+
+  it("flush closes an open utterance when the mic drops", () => {
+    const t = new VocalTracker();
+    t.step(0, 0.08, 0.04, 140, 500, 1400);
+    t.step(80, 0.08, 0.04, 140, 500, 1400);
+    assert.equal(t.open, true);
+    const ev = t.flush(240);
+    assert.ok(ev);
+    assert.equal(t.open, false);
+    assert.ok(ev.durationMs >= 30);
   });
 });
 

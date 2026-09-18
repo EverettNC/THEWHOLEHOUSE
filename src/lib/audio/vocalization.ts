@@ -34,7 +34,9 @@ export type VocalEvent = {
 const ONSET = 0.016;
 const OFFSET = 0.0065;
 const MIN_MS = 30;
+const MAX_MS = 6000;
 const TAPE_CAP = 360;
+const NOISE_SEED = 0.004;
 
 function median(xs: number[]): number {
   if (xs.length === 0) return 0;
@@ -73,6 +75,7 @@ type Active = {
 export class VocalTracker {
   private active: Active | null = null;
   private nextId = 1;
+  private noise = NOISE_SEED;
   events: VocalEvent[] = [];
 
   get open(): boolean {
@@ -81,6 +84,14 @@ export class VocalTracker {
 
   durationMs(now: number): number {
     return this.active ? now - this.active.startedAt : 0;
+  }
+
+  private onset(): number {
+    return Math.max(ONSET, this.noise * 2.8);
+  }
+
+  private offset(): number {
+    return Math.max(OFFSET, this.noise * 1.35);
   }
 
   step(
@@ -92,7 +103,7 @@ export class VocalTracker {
     f2: number,
   ): VocalEvent | null {
     if (!this.active) {
-      if (rms >= ONSET) {
+      if (rms >= this.onset()) {
         this.active = {
           startedAt: now,
           peakRms: rms,
@@ -104,6 +115,8 @@ export class VocalTracker {
           f2,
           tape: [{ t: 0, rms, zcr, f0 }],
         };
+      } else {
+        this.noise = this.noise * 0.98 + rms * 0.02;
       }
       return null;
     }
@@ -121,19 +134,34 @@ export class VocalTracker {
       a.tape.push({ t: now - a.startedAt, rms, zcr, f0 });
     }
 
-    if (rms < OFFSET && now - a.startedAt >= MIN_MS) {
-      return this.close(now);
+    const held = now - a.startedAt;
+    const hung = held >= MAX_MS || a.tape.length >= TAPE_CAP;
+    if ((rms < this.offset() && held >= MIN_MS) || hung) {
+      return this.close(now, hung && rms >= this.offset());
     }
     return null;
   }
 
-  private close(now: number): VocalEvent {
+  flush(now: number): VocalEvent | null {
+    if (!this.active) return null;
+    if (now - this.active.startedAt < MIN_MS) {
+      this.active = null;
+      return null;
+    }
+    return this.close(now, false);
+  }
+
+  private close(now: number, hungOnEnergy: boolean): VocalEvent {
     const a = this.active!;
     this.active = null;
     const durationMs = now - a.startedAt;
     const voiced = a.f0s.length >= 2;
     const f0 = voiced ? median(a.f0s) : null;
     const zcr = a.zcrs.reduce((s, x) => s + x, 0) / Math.max(1, a.zcrs.length);
+    if (hungOnEnergy) {
+      const floor = median(a.tape.map((frame) => frame.rms));
+      this.noise = Math.max(this.noise, floor);
+    }
     const ev: VocalEvent = {
       id: this.nextId++,
       kind: classify(durationMs, voiced, zcr, f0),

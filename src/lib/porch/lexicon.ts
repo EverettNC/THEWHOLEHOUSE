@@ -28,6 +28,14 @@ export const FAMILY_NAMES = [
   "Canal",
   "Opus",
   "Claude",
+  "Anthropic",
+  "Nebius",
+  "NVIDIA",
+  "Vercel",
+  "Hugging Face",
+  "Perplexity",
+  "Luma Cognify",
+  "Christman AI Project",
 ] as const;
 
 /** Dialect that prissy STT "fixes." Keep it. */

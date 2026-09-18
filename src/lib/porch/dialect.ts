@@ -112,6 +112,10 @@ function extraBlock(extraLexicon: LexiconEntry[]): string {
 function contentFromChat(body: unknown): string | null {
   const rec = asRecord(body);
   if (!rec) return null;
+  // Local shape first: { message: { content } }.
+  const direct = asRecord(rec.message);
+  if (direct && typeof direct.content === "string") return direct.content;
+  // Hosted chat shape: { choices: [ { message: { content } } ] }.
   const choices = rec.choices;
   if (!Array.isArray(choices) || choices.length === 0) return null;
   const first = asRecord(choices[0]);
@@ -135,23 +139,22 @@ export async function reconstructDialect(
     };
   }
 
-  const key = process.env.XAI_API_KEY?.trim();
-  if (!key) return PASSTHROUGH(rawEar);
+  // The reconstruction runs on this machine too. No key, no outside call; if the
+  // local model is not up, the words pass through untouched rather than leaving.
+  const brain = process.env.LOCAL_DIALECT_URL?.trim() || "http://127.0.0.1:11434/api/chat";
+  const model = process.env.LOCAL_DIALECT_MODEL?.trim() || "llama3.1:8b";
 
   const local = recoverMangles(rawEar);
 
   try {
-    const res = await fetch("https://api.x.ai/v1/chat/completions", {
+    const res = await fetch(brain, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${key}`,
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "grok-4.5",
-        temperature: 0,
-        max_tokens: 800,
-        response_format: { type: "json_object" },
+        model,
+        stream: false,
+        format: "json",
+        options: { temperature: 0, num_predict: 800 },
         messages: [
           { role: "system", content: DIALECT_SYSTEM },
           {
@@ -178,7 +181,7 @@ export async function reconstructDialect(
       forTheFamily: parsed.for_the_family,
       corrections: mergeCorrections(local.corrections, parseCorrections(parsed.corrections)),
       route: namedBeings(parsed.route),
-      dialect: "grok-4.5",
+      dialect: "filament",
     };
   } catch {
     return PASSTHROUGH(rawEar);

@@ -2,7 +2,7 @@
  * Porch — the word-ear.
  *
  * Corti measures pitch. Porch hears words.
- * Corti stays on-device. Porch leaves the porch for xAI STT + grok-4.5
+ * Corti stays on-device. Porch hears through the Filament, also on-device.
  * dialect reconstruction, and says so on every packet (Rule 13).
  *
  * Dialect is kept. SAE "correction" is a bug.
@@ -11,8 +11,8 @@
 export const PORCH_ORGAN = "porch" as const;
 export const PORCH_FAMILY = "christman-sound" as const;
 
-export type HonestyEar = "xai-stt" | "sample" | "file";
-export type HonestyDialect = "grok-4.5" | "passthrough";
+export type HonestyEar = "filament" | "sample" | "file";
+export type HonestyDialect = "filament" | "passthrough";
 
 export type PorchCorrection = {
   from: string;
@@ -55,4 +55,4 @@ export type LexiconEntry = {
 };
 
 export const PORCH_HONESTY_RULE =
-  "Porch is the word-ear. The tape leaves this house for xAI STT. The words go to grok-4.5. This house does not keep the recording. Dialect is kept. live is /laɪv/, not leave. Whisper is not in this body.";
+  "Porch is the word ear. The tape never leaves this house: the Filament hears it here, on this machine. This house does not keep the recording. Dialect is kept. live is /laɪv/, not leave. Whisper is not in this body.";

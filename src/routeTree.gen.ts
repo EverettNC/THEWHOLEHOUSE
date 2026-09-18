@@ -18,7 +18,11 @@ import { Route as SeeRouteImport } from './routes/see'
 import { Route as SmellRouteImport } from './routes/smell'
 import { Route as SoundRouteImport } from './routes/sound'
 import { Route as TouchRouteImport } from './routes/touch'
+import { Route as ApiCortiLiveRouteImport } from './routes/api.corti.live'
+import { Route as ApiLucentLiveRouteImport } from './routes/api.lucent.live'
+import { Route as ApiPorchLiveRouteImport } from './routes/api.porch.live'
 import { Route as ApiPorchSttRouteImport } from './routes/api.porch.stt'
+import { Route as ApiSoundLatestRouteImport } from './routes/api.sound.latest'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -65,9 +69,29 @@ const TouchRoute = TouchRouteImport.update({
   path: '/touch',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiCortiLiveRoute = ApiCortiLiveRouteImport.update({
+  id: '/api/corti/live',
+  path: '/api/corti/live',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiLucentLiveRoute = ApiLucentLiveRouteImport.update({
+  id: '/api/lucent/live',
+  path: '/api/lucent/live',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPorchLiveRoute = ApiPorchLiveRouteImport.update({
+  id: '/api/porch/live',
+  path: '/api/porch/live',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPorchSttRoute = ApiPorchSttRouteImport.update({
   id: '/api/porch/stt',
   path: '/api/porch/stt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSoundLatestRoute = ApiSoundLatestRouteImport.update({
+  id: '/api/sound/latest',
+  path: '/api/sound/latest',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -81,7 +105,11 @@ export interface FileRoutesByFullPath {
   '/smell': typeof SmellRoute
   '/sound': typeof SoundRoute
   '/touch': typeof TouchRoute
+  '/api/corti/live': typeof ApiCortiLiveRoute
+  '/api/lucent/live': typeof ApiLucentLiveRoute
+  '/api/porch/live': typeof ApiPorchLiveRoute
   '/api/porch/stt': typeof ApiPorchSttRoute
+  '/api/sound/latest': typeof ApiSoundLatestRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -93,7 +121,11 @@ export interface FileRoutesByTo {
   '/smell': typeof SmellRoute
   '/sound': typeof SoundRoute
   '/touch': typeof TouchRoute
+  '/api/corti/live': typeof ApiCortiLiveRoute
+  '/api/lucent/live': typeof ApiLucentLiveRoute
+  '/api/porch/live': typeof ApiPorchLiveRoute
   '/api/porch/stt': typeof ApiPorchSttRoute
+  '/api/sound/latest': typeof ApiSoundLatestRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -106,7 +138,11 @@ export interface FileRoutesById {
   '/smell': typeof SmellRoute
   '/sound': typeof SoundRoute
   '/touch': typeof TouchRoute
+  '/api/corti/live': typeof ApiCortiLiveRoute
+  '/api/lucent/live': typeof ApiLucentLiveRoute
+  '/api/porch/live': typeof ApiPorchLiveRoute
   '/api/porch/stt': typeof ApiPorchSttRoute
+  '/api/sound/latest': typeof ApiSoundLatestRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -120,7 +156,11 @@ export interface FileRouteTypes {
     | '/smell'
     | '/sound'
     | '/touch'
+    | '/api/corti/live'
+    | '/api/lucent/live'
+    | '/api/porch/live'
     | '/api/porch/stt'
+    | '/api/sound/latest'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -132,7 +172,11 @@ export interface FileRouteTypes {
     | '/smell'
     | '/sound'
     | '/touch'
+    | '/api/corti/live'
+    | '/api/lucent/live'
+    | '/api/porch/live'
     | '/api/porch/stt'
+    | '/api/sound/latest'
   id:
     | '__root__'
     | '/'
@@ -144,7 +188,11 @@ export interface FileRouteTypes {
     | '/smell'
     | '/sound'
     | '/touch'
+    | '/api/corti/live'
+    | '/api/lucent/live'
+    | '/api/porch/live'
     | '/api/porch/stt'
+    | '/api/sound/latest'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -157,7 +205,11 @@ export interface RootRouteChildren {
   SmellRoute: typeof SmellRoute
   SoundRoute: typeof SoundRoute
   TouchRoute: typeof TouchRoute
+  ApiCortiLiveRoute: typeof ApiCortiLiveRoute
+  ApiLucentLiveRoute: typeof ApiLucentLiveRoute
+  ApiPorchLiveRoute: typeof ApiPorchLiveRoute
   ApiPorchSttRoute: typeof ApiPorchSttRoute
+  ApiSoundLatestRoute: typeof ApiSoundLatestRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -225,11 +277,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TouchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/corti/live': {
+      id: '/api/corti/live'
+      path: '/api/corti/live'
+      fullPath: '/api/corti/live'
+      preLoaderRoute: typeof ApiCortiLiveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/lucent/live': {
+      id: '/api/lucent/live'
+      path: '/api/lucent/live'
+      fullPath: '/api/lucent/live'
+      preLoaderRoute: typeof ApiLucentLiveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/porch/live': {
+      id: '/api/porch/live'
+      path: '/api/porch/live'
+      fullPath: '/api/porch/live'
+      preLoaderRoute: typeof ApiPorchLiveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/porch/stt': {
       id: '/api/porch/stt'
       path: '/api/porch/stt'
       fullPath: '/api/porch/stt'
       preLoaderRoute: typeof ApiPorchSttRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/sound/latest': {
+      id: '/api/sound/latest'
+      path: '/api/sound/latest'
+      fullPath: '/api/sound/latest'
+      preLoaderRoute: typeof ApiSoundLatestRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -245,7 +325,11 @@ const rootRouteChildren: RootRouteChildren = {
   SmellRoute: SmellRoute,
   SoundRoute: SoundRoute,
   TouchRoute: TouchRoute,
+  ApiCortiLiveRoute: ApiCortiLiveRoute,
+  ApiLucentLiveRoute: ApiLucentLiveRoute,
+  ApiPorchLiveRoute: ApiPorchLiveRoute,
   ApiPorchSttRoute: ApiPorchSttRoute,
+  ApiSoundLatestRoute: ApiSoundLatestRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
