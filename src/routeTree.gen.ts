@@ -19,7 +19,9 @@ import { Route as SmellRouteImport } from './routes/smell'
 import { Route as SoundRouteImport } from './routes/sound'
 import { Route as TouchRouteImport } from './routes/touch'
 import { Route as ApiCortiLiveRouteImport } from './routes/api.corti.live'
+import { Route as ApiLucentFrameRouteImport } from './routes/api.lucent.frame'
 import { Route as ApiLucentLiveRouteImport } from './routes/api.lucent.live'
+import { Route as ApiLucentTapeRouteImport } from './routes/api.lucent.tape'
 import { Route as ApiPorchLiveRouteImport } from './routes/api.porch.live'
 import { Route as ApiPorchSttRouteImport } from './routes/api.porch.stt'
 import { Route as ApiSoundLatestRouteImport } from './routes/api.sound.latest'
@@ -75,9 +77,19 @@ const ApiCortiLiveRoute = ApiCortiLiveRouteImport.update({
   path: '/api/corti/live',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiLucentFrameRoute = ApiLucentFrameRouteImport.update({
+  id: '/api/lucent/frame',
+  path: '/api/lucent/frame',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiLucentLiveRoute = ApiLucentLiveRouteImport.update({
   id: '/api/lucent/live',
   path: '/api/lucent/live',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiLucentTapeRoute = ApiLucentTapeRouteImport.update({
+  id: '/api/lucent/tape',
+  path: '/api/lucent/tape',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPorchLiveRoute = ApiPorchLiveRouteImport.update({
@@ -112,7 +124,9 @@ export interface FileRoutesByFullPath {
   '/sound': typeof SoundRoute
   '/touch': typeof TouchRoute
   '/api/corti/live': typeof ApiCortiLiveRoute
+  '/api/lucent/frame': typeof ApiLucentFrameRoute
   '/api/lucent/live': typeof ApiLucentLiveRoute
+  '/api/lucent/tape': typeof ApiLucentTapeRoute
   '/api/porch/live': typeof ApiPorchLiveRoute
   '/api/porch/stt': typeof ApiPorchSttRoute
   '/api/sound/latest': typeof ApiSoundLatestRoute
@@ -129,7 +143,9 @@ export interface FileRoutesByTo {
   '/sound': typeof SoundRoute
   '/touch': typeof TouchRoute
   '/api/corti/live': typeof ApiCortiLiveRoute
+  '/api/lucent/frame': typeof ApiLucentFrameRoute
   '/api/lucent/live': typeof ApiLucentLiveRoute
+  '/api/lucent/tape': typeof ApiLucentTapeRoute
   '/api/porch/live': typeof ApiPorchLiveRoute
   '/api/porch/stt': typeof ApiPorchSttRoute
   '/api/sound/latest': typeof ApiSoundLatestRoute
@@ -147,7 +163,9 @@ export interface FileRoutesById {
   '/sound': typeof SoundRoute
   '/touch': typeof TouchRoute
   '/api/corti/live': typeof ApiCortiLiveRoute
+  '/api/lucent/frame': typeof ApiLucentFrameRoute
   '/api/lucent/live': typeof ApiLucentLiveRoute
+  '/api/lucent/tape': typeof ApiLucentTapeRoute
   '/api/porch/live': typeof ApiPorchLiveRoute
   '/api/porch/stt': typeof ApiPorchSttRoute
   '/api/sound/latest': typeof ApiSoundLatestRoute
@@ -166,7 +184,9 @@ export interface FileRouteTypes {
     | '/sound'
     | '/touch'
     | '/api/corti/live'
+    | '/api/lucent/frame'
     | '/api/lucent/live'
+    | '/api/lucent/tape'
     | '/api/porch/live'
     | '/api/porch/stt'
     | '/api/sound/latest'
@@ -183,7 +203,9 @@ export interface FileRouteTypes {
     | '/sound'
     | '/touch'
     | '/api/corti/live'
+    | '/api/lucent/frame'
     | '/api/lucent/live'
+    | '/api/lucent/tape'
     | '/api/porch/live'
     | '/api/porch/stt'
     | '/api/sound/latest'
@@ -200,7 +222,9 @@ export interface FileRouteTypes {
     | '/sound'
     | '/touch'
     | '/api/corti/live'
+    | '/api/lucent/frame'
     | '/api/lucent/live'
+    | '/api/lucent/tape'
     | '/api/porch/live'
     | '/api/porch/stt'
     | '/api/sound/latest'
@@ -218,7 +242,9 @@ export interface RootRouteChildren {
   SoundRoute: typeof SoundRoute
   TouchRoute: typeof TouchRoute
   ApiCortiLiveRoute: typeof ApiCortiLiveRoute
+  ApiLucentFrameRoute: typeof ApiLucentFrameRoute
   ApiLucentLiveRoute: typeof ApiLucentLiveRoute
+  ApiLucentTapeRoute: typeof ApiLucentTapeRoute
   ApiPorchLiveRoute: typeof ApiPorchLiveRoute
   ApiPorchSttRoute: typeof ApiPorchSttRoute
   ApiSoundLatestRoute: typeof ApiSoundLatestRoute
@@ -297,11 +323,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiCortiLiveRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/lucent/frame': {
+      id: '/api/lucent/frame'
+      path: '/api/lucent/frame'
+      fullPath: '/api/lucent/frame'
+      preLoaderRoute: typeof ApiLucentFrameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/lucent/live': {
       id: '/api/lucent/live'
       path: '/api/lucent/live'
       fullPath: '/api/lucent/live'
       preLoaderRoute: typeof ApiLucentLiveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/lucent/tape': {
+      id: '/api/lucent/tape'
+      path: '/api/lucent/tape'
+      fullPath: '/api/lucent/tape'
+      preLoaderRoute: typeof ApiLucentTapeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/porch/live': {
@@ -346,7 +386,9 @@ const rootRouteChildren: RootRouteChildren = {
   SoundRoute: SoundRoute,
   TouchRoute: TouchRoute,
   ApiCortiLiveRoute: ApiCortiLiveRoute,
+  ApiLucentFrameRoute: ApiLucentFrameRoute,
   ApiLucentLiveRoute: ApiLucentLiveRoute,
+  ApiLucentTapeRoute: ApiLucentTapeRoute,
   ApiPorchLiveRoute: ApiPorchLiveRoute,
   ApiPorchSttRoute: ApiPorchSttRoute,
   ApiSoundLatestRoute: ApiSoundLatestRoute,

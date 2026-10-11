@@ -55,6 +55,17 @@ export const Route = createFileRoute("/api/lucent/live")({
           height: typeof body.height === "number" ? body.height : 0,
           kind: body.kind ?? null,
         });
+        // The rack holds one frame. ELEMENTS keeps the sight.
+        if (live.seeing && live.b64) {
+          const { writeLucentFrame } = await import("@/lib/sound/lucent-disk");
+          writeLucentFrame({
+            at: live.t,
+            b64: live.b64,
+            width: live.width,
+            height: live.height,
+            kind: live.kind,
+          });
+        }
         return Response.json({
           ok: true,
           measured: true,
