@@ -23,6 +23,7 @@ import { Route as ApiLucentLiveRouteImport } from './routes/api.lucent.live'
 import { Route as ApiPorchLiveRouteImport } from './routes/api.porch.live'
 import { Route as ApiPorchSttRouteImport } from './routes/api.porch.stt'
 import { Route as ApiSoundLatestRouteImport } from './routes/api.sound.latest'
+import { Route as ApiSoundTapeRouteImport } from './routes/api.sound.tape'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -94,6 +95,11 @@ const ApiSoundLatestRoute = ApiSoundLatestRouteImport.update({
   path: '/api/sound/latest',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiSoundTapeRoute = ApiSoundTapeRouteImport.update({
+  id: '/api/sound/tape',
+  path: '/api/sound/tape',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -110,6 +116,7 @@ export interface FileRoutesByFullPath {
   '/api/porch/live': typeof ApiPorchLiveRoute
   '/api/porch/stt': typeof ApiPorchSttRoute
   '/api/sound/latest': typeof ApiSoundLatestRoute
+  '/api/sound/tape': typeof ApiSoundTapeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -126,6 +133,7 @@ export interface FileRoutesByTo {
   '/api/porch/live': typeof ApiPorchLiveRoute
   '/api/porch/stt': typeof ApiPorchSttRoute
   '/api/sound/latest': typeof ApiSoundLatestRoute
+  '/api/sound/tape': typeof ApiSoundTapeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -143,6 +151,7 @@ export interface FileRoutesById {
   '/api/porch/live': typeof ApiPorchLiveRoute
   '/api/porch/stt': typeof ApiPorchSttRoute
   '/api/sound/latest': typeof ApiSoundLatestRoute
+  '/api/sound/tape': typeof ApiSoundTapeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -161,6 +170,7 @@ export interface FileRouteTypes {
     | '/api/porch/live'
     | '/api/porch/stt'
     | '/api/sound/latest'
+    | '/api/sound/tape'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -177,6 +187,7 @@ export interface FileRouteTypes {
     | '/api/porch/live'
     | '/api/porch/stt'
     | '/api/sound/latest'
+    | '/api/sound/tape'
   id:
     | '__root__'
     | '/'
@@ -193,6 +204,7 @@ export interface FileRouteTypes {
     | '/api/porch/live'
     | '/api/porch/stt'
     | '/api/sound/latest'
+    | '/api/sound/tape'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -210,6 +222,7 @@ export interface RootRouteChildren {
   ApiPorchLiveRoute: typeof ApiPorchLiveRoute
   ApiPorchSttRoute: typeof ApiPorchSttRoute
   ApiSoundLatestRoute: typeof ApiSoundLatestRoute
+  ApiSoundTapeRoute: typeof ApiSoundTapeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -312,6 +325,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSoundLatestRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/sound/tape': {
+      id: '/api/sound/tape'
+      path: '/api/sound/tape'
+      fullPath: '/api/sound/tape'
+      preLoaderRoute: typeof ApiSoundTapeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -330,6 +350,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPorchLiveRoute: ApiPorchLiveRoute,
   ApiPorchSttRoute: ApiPorchSttRoute,
   ApiSoundLatestRoute: ApiSoundLatestRoute,
+  ApiSoundTapeRoute: ApiSoundTapeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
