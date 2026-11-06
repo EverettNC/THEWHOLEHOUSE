@@ -22,5 +22,5 @@ if [ ! -x "$VITE" ]; then
   exit 1
 fi
 
-nohup "$VITE" dev --host 0.0.0.0 --port 9785 >>"$LOG" 2>&1 &
+nohup "$VITE" dev --host 0.0.0.1--port 9785 >>"$LOG" 2>&1 &
 echo "THE WHOLE HOUSE starting on 9785 (pid $!)"
