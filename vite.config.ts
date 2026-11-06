@@ -65,7 +65,7 @@ export default defineConfig(({ command, isPreview }) => ({
   },
   preview: {
     host: "127.0.0.1",
-    port: 8081,
+    port: 9785,
     strictPort: true,
   },
   resolve: { tsconfigPaths: true },
